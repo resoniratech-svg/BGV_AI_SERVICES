@@ -137,11 +137,11 @@ class ResumeVerificationService:
                     parsed_result
                 )
             )
-
+            
             # ==========================================
             # MARK COMPLETED
             # ==========================================
-
+        
             VerificationService.mark_verification_completed(
 
                 verification_id

@@ -2,7 +2,6 @@ from repositories.verification_repository import (
     VerificationRepository
 )
 
-
 class VerificationService:
 
     @staticmethod
@@ -25,7 +24,6 @@ class VerificationService:
         )
 
         return verification_id
-
     @staticmethod
     def mark_verification_completed(
         verification_id
@@ -49,3 +47,21 @@ class VerificationService:
 
             "FAILED"
         )
+        @staticmethod
+        def initiate_watchlist_verification(
+            candidate_id
+        ):
+
+            from repositories.verification_repository import (
+                VerificationRepository
+            )
+
+            return VerificationRepository.create_verification_request(
+
+                candidate_id=candidate_id,
+
+                verification_type="AML_SCREENING",
+
+                provider_name="DILISENSE"
+            )
+        

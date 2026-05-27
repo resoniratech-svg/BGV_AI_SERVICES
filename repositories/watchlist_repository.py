@@ -83,34 +83,88 @@ class WatchlistRepository:
         connection.close()
 
     @staticmethod
-    def get_watchlist_result(
+    def save_watchlist_result(
 
-        candidate_id
+        candidate_id,
+        verification_id,
+        full_name,
+        country,
+        aml_status,
+        risk_level,
+        pep_match,
+        sanctions_match,
+        adverse_media_match,
+        provider_name,
+        raw_response
     ):
+
+        print("WATCHLIST INSERT STARTED")
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor()
 
         query = """
-            SELECT *
+            INSERT INTO watchlist_results (
 
-            FROM watchlist_results
+                candidate_id,
+                verification_id,
+                full_name,
+                country,
+                aml_status,
+                risk_level,
+                pep_match,
+                sanctions_match,
+                adverse_media_match,
+                provider_name,
+                raw_response
 
-            WHERE candidate_id = %s
+            )
+
+            VALUES (
+
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
+            )
         """
+
+        values = (
+
+            candidate_id,
+            verification_id,
+            full_name,
+            country,
+            aml_status,
+            risk_level,
+            pep_match,
+            sanctions_match,
+            adverse_media_match,
+            provider_name,
+            raw_response
+        )
 
         cursor.execute(
             query,
-            (candidate_id,)
+            values
         )
 
-        result = cursor.fetchall()
+        print("WATCHLIST INSERT EXECUTED")
+
+        connection.commit()
+
+        print("WATCHLIST INSERT COMMITTED")
 
         cursor.close()
 
         connection.close()
 
-        return result
+    

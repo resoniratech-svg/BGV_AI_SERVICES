@@ -1,4 +1,4 @@
-from db import mysql
+from db import get_connection
 
 
 class DiditRepository:
@@ -6,7 +6,9 @@ class DiditRepository:
     @staticmethod
     def save_verification_session(data):
 
-        cursor = mysql.connection.cursor()
+        connection = get_connection()
+
+        cursor = connection.cursor()
 
         query = """
         INSERT INTO verification_sessions (
@@ -39,20 +41,27 @@ class DiditRepository:
             data["status"]
         )
 
-        cursor.execute(query, values)
+        cursor.execute(
+            query,
+            values
+        )
 
-        mysql.connection.commit()
+        connection.commit()
 
         session_id = cursor.lastrowid
 
         cursor.close()
+
+        connection.close()
 
         return session_id
 
     @staticmethod
     def save_provider_callback(data):
 
-        cursor = mysql.connection.cursor()
+        connection = get_connection()
+
+        cursor = connection.cursor()
 
         query = """
         INSERT INTO provider_callbacks (
@@ -79,16 +88,23 @@ class DiditRepository:
             data["callback_status"]
         )
 
-        cursor.execute(query, values)
+        cursor.execute(
+            query,
+            values
+        )
 
-        mysql.connection.commit()
+        connection.commit()
 
         cursor.close()
+
+        connection.close()
 
     @staticmethod
     def save_verification_document(data):
 
-        cursor = mysql.connection.cursor()
+        connection = get_connection()
+
+        cursor = connection.cursor()
 
         query = """
         INSERT INTO verification_documents (
@@ -127,35 +143,46 @@ class DiditRepository:
             data["raw_response"]
         )
 
-        cursor.execute(query, values)
+        cursor.execute(
+            query,
+            values
+        )
 
-        mysql.connection.commit()
+        connection.commit()
 
         cursor.close()
-@staticmethod
-def update_session_status(
-    provider_session_id,
-    status
-):
 
-    cursor = mysql.connection.cursor()
+        connection.close()
 
-    query = """
-    UPDATE verification_sessions
-    SET status = %s
-    WHERE provider_session_id = %s
-    """
+    @staticmethod
+    def update_session_status(
 
-    cursor.execute(
+        provider_session_id,
+        status
+    ):
 
-        query,
+        connection = get_connection()
 
-        (
-            status,
-            provider_session_id
+        cursor = connection.cursor()
+
+        query = """
+        UPDATE verification_sessions
+        SET status = %s
+        WHERE provider_session_id = %s
+        """
+
+        cursor.execute(
+
+            query,
+
+            (
+                status,
+                provider_session_id
+            )
         )
-    )
 
-    mysql.connection.commit()
+        connection.commit()
 
-    cursor.close()
+        cursor.close()
+
+        connection.close()

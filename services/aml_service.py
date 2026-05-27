@@ -1,5 +1,6 @@
 import json
 import requests
+
 from config import Config
 
 from repositories.watchlist_repository import (
@@ -106,6 +107,8 @@ class AMLService:
             # SAVE RESULT
             # ==========================================
 
+            print("WATCHLIST INSERT STARTED")
+
             WatchlistRepository.save_watchlist_result(
 
                 candidate_id=candidate_id,
@@ -133,6 +136,8 @@ class AMLService:
                 )
             )
 
+            print("WATCHLIST INSERT EXECUTED")
+
             # ==========================================
             # MARK COMPLETED
             # ==========================================
@@ -141,6 +146,8 @@ class AMLService:
 
                 verification_id
             )
+
+            print("WATCHLIST INSERT COMMITTED")
 
             # ==========================================
             # FINAL RESPONSE
@@ -187,12 +194,6 @@ class AMLService:
 
                 "error": str(e)
             }
-    import requests
-
-
-
-
-class AMLService:
 
     @staticmethod
     def screen_individual(
@@ -243,3 +244,45 @@ class AMLService:
         response.raise_for_status()
 
         return response.json()
+
+    @staticmethod
+    def save_screening_result(
+
+        candidate_id,
+        verification_id,
+        full_name,
+        country,
+        response_data
+    ):
+
+        WatchlistRepository.save_watchlist_result(
+
+            candidate_id=candidate_id,
+
+            verification_id=verification_id,
+
+            full_name=full_name,
+
+            country=country,
+
+            aml_status="CLEAR",
+
+            risk_level="LOW",
+
+            pep_match=False,
+
+            sanctions_match=False,
+
+            adverse_media_match=False,
+
+            provider_name="DILISENSE",
+
+            raw_response=json.dumps(
+                response_data
+            )
+        )
+
+        VerificationService.mark_verification_completed(
+
+            verification_id
+        )
