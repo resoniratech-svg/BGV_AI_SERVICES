@@ -84,6 +84,55 @@ class Config:
         os.getenv("MYSQL_PORT", 3306)
     )
 # ==========================================
+# RCHILLI CONFIG
+# ==========================================
+
+    # ==========================================
+# RCHILLI CONFIG
+# ==========================================
+
+    # ==========================================
+# RCHILLI CONFIG
+# ==========================================
+
+    RCHILLI_API_URL = os.getenv(
+        "RCHILLI_API_URL"
+    )
+
+    RCHILLI_USER_KEY = os.getenv(
+        "RCHILLI_USER_KEY"
+    )
+
+    RCHILLI_VERSION = os.getenv(
+        "RCHILLI_VERSION"
+    )
+
+    RCHILLI_SUBUSER_ID = os.getenv(
+        "RCHILLI_SUBUSER_ID"
+    )
+    # ==========================================
+# DILISENSE AML CONFIG
+# ==========================================
+
+    # ==========================================
+# DILISENSE CONFIG
+# ==========================================
+
+    DILISENSE_API_KEY = os.getenv(
+        "DILISENSE_API_KEY"
+    )
+
+    DILISENSE_BASE_URL = os.getenv(
+        "DILISENSE_BASE_URL"
+    )
+
+    DILISENSE_TIMEOUT = int(
+        os.getenv(
+            "DILISENSE_TIMEOUT",
+            60
+        )
+    )
+# ==========================================
 # TESSERACT
 # ==========================================
 

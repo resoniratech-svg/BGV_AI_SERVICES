@@ -12,22 +12,13 @@ from routes.health_routes import health_bp
 from utils.auth import generate_token
 from routes.didit_routes import didit_bp
 from routes.didit_webhook_routes import didit_webhook_bp
+from routes.rchilli_routes import (
+    rchilli_bp
+)
+from routes.dilisense_routes import (
+    dilisense_bp
+)
 app = Flask(__name__)
-# ==========================================
-# MYSQL CONFIGURATION
-# ==========================================
-
-app.config["MYSQL_HOST"] = Config.MYSQL_HOST
-
-app.config["MYSQL_USER"] = Config.MYSQL_USER
-
-app.config["MYSQL_PASSWORD"] = Config.MYSQL_PASSWORD
-
-app.config["MYSQL_DB"] = Config.MYSQL_DB
-
-app.config["MYSQL_PORT"] = Config.MYSQL_PORT
-
-mysql.init_app(app)
 # JWT Configuration
 app.config["JWT_SECRET_KEY"] = Config.JWT_SECRET_KEY
 
@@ -60,6 +51,17 @@ app.register_blueprint(
 )
 app.register_blueprint(
     didit_webhook_bp,
+    url_prefix="/api/v1"
+)
+app.register_blueprint(
+    rchilli_bp,
+    url_prefix="/api/v1"
+)
+
+app.register_blueprint(
+
+    dilisense_bp,
+
     url_prefix="/api/v1"
 )
 # LOGIN API
@@ -125,4 +127,5 @@ if __name__ == "__main__":
 
         debug=True
     )
+
     
