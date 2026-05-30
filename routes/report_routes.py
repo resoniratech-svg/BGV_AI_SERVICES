@@ -75,3 +75,34 @@ def generate_bgv_report():
 
             "error": str(e)
         }), 500
+
+
+@report_bp.route(
+
+    "/reports/history",
+    methods=["GET"]
+)
+def get_report_history():
+
+    try:
+
+        reports = (
+            ReportService
+            .get_report_history()
+        )
+
+        return jsonify({
+
+            "status": "success",
+
+            "reports": reports
+        }), 200
+
+    except Exception as e:
+
+        return jsonify({
+
+            "status": "failed",
+
+            "error": str(e)
+        }), 500

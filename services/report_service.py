@@ -16,6 +16,8 @@ from repositories.report_repository import (
     ReportRepository
 )
 
+import uuid
+
 
 class ReportService:
 
@@ -300,4 +302,53 @@ class ReportService:
 
         document.build(elements)
 
+        # ==========================================
+        # STORE REPORT DETAILS IN DATABASE
+        # ==========================================
+
+        reference_id = (
+
+            f"BGV-"
+            f"{uuid.uuid4().hex[:10].upper()}"
+        )
+
+        report_data = {
+
+            "candidate_id": candidate_id,
+
+            "report_reference_id": reference_id,
+
+            "report_name":
+                "Full Background Verification Report",
+
+            "report_type": "FULL_BGV",
+
+            "report_status": "COMPLETED",
+
+            "verification_status": "VERIFIED",
+
+            "file_name": file_name,
+
+            "file_path": file_path,
+
+            "file_url": file_path,
+
+            "storage_provider": "LOCAL_STORAGE"
+        }
+
+        ReportRepository.save_report_details(
+
+            report_data
+        )
+
         return file_path
+
+    @staticmethod
+    def get_report_history():
+
+        reports = (
+            ReportRepository
+            .get_report_history()
+        )
+
+        return reports
