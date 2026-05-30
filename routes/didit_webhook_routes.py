@@ -8,6 +8,14 @@ from app.repositories.didit_repository import (
     DiditRepository
 )
 
+from repositories.driving_license_repository import (
+    DrivingLicenseRepository
+)
+
+from repositories.passport_repository import (
+    PassportRepository
+)
+
 didit_webhook_bp = Blueprint(
     "didit_webhook_bp",
     __name__
@@ -20,85 +28,215 @@ didit_webhook_bp = Blueprint(
 )
 def didit_webhook():
 
-    data = request.json
+    try:
 
-    print(data)
+        data = request.json
 
-    # ==========================================
-    # SAVE CALLBACK LOG
-    # ==========================================
+        print(data)
 
-    DiditRepository.save_provider_callback({
+        # ==========================================
+        # DOCUMENT DATA
+        # ==========================================
 
-        "provider_name": "DIDIT",
-
-        "provider_session_id": data.get(
-            "session_id"
-        ),
-
-        "callback_type": "VERIFICATION_RESULT",
-
-        "callback_payload": json.dumps(data),
-
-        "callback_status": data.get(
-            "status"
+        document_data = data.get(
+            "document",
+            {}
         )
-    })
 
-    # ==========================================
-    # SAVE DOCUMENT DETAILS
-    # ==========================================
+        document_type = (
+            document_data.get(
+                "document_type",
+                ""
+            )
+            .strip()
+            .upper()
+        )
 
-    document_data = data.get(
-        "document",
-        {}
-    )
-    DiditRepository.update_session_status(
+        # ==========================================
+        # SAVE CALLBACK LOG
+        # ==========================================
 
-    provider_session_id=data.get(
-        "session_id"
-    ),
+        DiditRepository.save_provider_callback({
 
-    status=data.get(
-        "status"
-    )
-)
-    DiditRepository.save_verification_document({
+            "provider_name": "DIDIT",
 
-        "session_id": 1,
+            "provider_session_id": data.get(
+                "session_id"
+            ),
 
-        "candidate_id": 1,
+            "callback_type": "VERIFICATION_RESULT",
 
-        "document_type": document_data.get(
-            "document_type"
-        ),
+            "callback_payload": json.dumps(
+                data
+            ),
 
-        "document_number": document_data.get(
-            "document_number"
-        ),
+            "callback_status": data.get(
+                "status"
+            )
+        })
 
-        "full_name": document_data.get(
-            "full_name"
-        ),
+        # ==========================================
+        # UPDATE SESSION STATUS
+        # ==========================================
 
-        "nationality": document_data.get(
-            "nationality"
-        ),
+        DiditRepository.update_session_status(
 
-        "issuing_country": document_data.get(
-            "issuing_country"
-        ),
+            provider_session_id=data.get(
+                "session_id"
+            ),
 
-        "verification_status": data.get(
-            "status"
-        ),
+            status=data.get(
+                "status"
+            )
+        )
 
-        "raw_response": json.dumps(data)
-    })
+        # ==========================================
+        # SAVE VERIFICATION DOCUMENT
+        # ==========================================
 
-    return jsonify({
+        DiditRepository.save_verification_document({
 
-        "status": "success",
+            "session_id": 1,
 
-        "message": "Webhook processed successfully"
-    }), 200
+            "candidate_id": 1,
+
+            "document_type": document_type,
+
+            "document_number": document_data.get(
+                "document_number"
+            ),
+
+            "full_name": document_data.get(
+                "full_name"
+            ),
+
+            "nationality": document_data.get(
+                "nationality"
+            ),
+
+            "issuing_country": document_data.get(
+                "issuing_country"
+            ),
+
+            "verification_status": data.get(
+                "status"
+            ),
+
+            "raw_response": json.dumps(
+                data
+            )
+        })
+
+        # ==========================================
+        # SAVE DRIVING LICENSE RESULT
+        # ==========================================
+
+        if document_type == "DRIVING_LICENSE":
+
+            DrivingLicenseRepository.save_driving_license_result(
+
+                candidate_id=1,
+
+                bgv_id=1,
+
+                verification_status=data.get(
+                    "status"
+                ),
+
+                license_number=document_data.get(
+                    "document_number"
+                ),
+
+                full_name=document_data.get(
+                    "full_name"
+                ),
+
+                date_of_birth=document_data.get(
+                    "date_of_birth"
+                ),
+
+                issue_date=document_data.get(
+                    "issue_date"
+                ),
+
+                expiry_date=document_data.get(
+                    "expiry_date"
+                ),
+
+                provider_name="Didit",
+
+                raw_response=json.dumps(
+                    data
+                )
+            )
+
+        # ==========================================
+        # SAVE PASSPORT RESULT
+        # ==========================================
+
+        elif document_type == "PASSPORT":
+
+            PassportRepository.save_passport_result(
+
+                candidate_id=1,
+
+                bgv_id=1,
+
+                verification_status=data.get(
+                    "status"
+                ),
+
+                passport_number=document_data.get(
+                    "document_number"
+                ),
+
+                full_name=document_data.get(
+                    "full_name"
+                ),
+
+                nationality=document_data.get(
+                    "nationality"
+                ),
+
+                country=document_data.get(
+                    "issuing_country"
+                ),
+
+                date_of_birth=document_data.get(
+                    "date_of_birth"
+                ),
+
+                issue_date=document_data.get(
+                    "issue_date"
+                ),
+
+                expiry_date=document_data.get(
+                    "expiry_date"
+                ),
+
+                provider_name="Didit",
+
+                raw_response=json.dumps(
+                    data
+                )
+            )
+
+        return jsonify({
+
+            "status": "success",
+
+            "message": "Webhook processed successfully"
+        }), 200
+
+    except Exception as error:
+
+        print(str(error))
+
+        return jsonify({
+
+            "status": "failed",
+
+            "message": "Webhook processing failed",
+
+            "error": str(error)
+        }), 500

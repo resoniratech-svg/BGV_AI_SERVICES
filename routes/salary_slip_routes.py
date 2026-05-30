@@ -4,29 +4,30 @@ from flask import jsonify
 
 import os
 import uuid
-from services.resume_verification_service import (
-    ResumeVerificationService
-)
+
 from werkzeug.utils import secure_filename
 
 from config import Config
 
-from services.rchilli_service import (
-    RChilliService
+from services.salary_slip_service import (
+    SalarySlipService
 )
-from services.resume_verification_service import ResumeVerificationService
 
-rchilli_bp = Blueprint(
-    "rchilli_bp",
+salary_slip_bp = Blueprint(
+
+    "salary_slip_bp",
+
     __name__
 )
 
 
-@rchilli_bp.route(
-    "/resume/parse",
+@salary_slip_bp.route(
+
+    "/salary-slip/verify",
+
     methods=["POST"]
 )
-def parse_resume():
+def verify_salary_slip():
 
     try:
 
@@ -34,24 +35,30 @@ def parse_resume():
         # VALIDATE FILE
         # ==========================================
 
-        if "resume" not in request.files:
+        if "file" not in request.files:
 
             return jsonify({
 
                 "success": False,
 
-                "message": "Resume file missing"
+                "message": (
+                    "Salary slip file missing"
+                )
             }), 400
 
-        resume_file = request.files["resume"]
+        salary_slip_file = request.files[
+            "file"
+        ]
 
-        if resume_file.filename == "":
+        if salary_slip_file.filename == "":
 
             return jsonify({
 
                 "success": False,
 
-                "message": "Invalid resume file"
+                "message": (
+                    "Invalid salary slip file"
+                )
             }), 400
 
         # ==========================================
@@ -68,7 +75,9 @@ def parse_resume():
 
                 "success": False,
 
-                "message": "candidate_id missing"
+                "message": (
+                    "candidate_id missing"
+                )
             }), 400
 
         # ==========================================
@@ -76,10 +85,12 @@ def parse_resume():
         # ==========================================
 
         original_filename = secure_filename(
-            resume_file.filename
+
+            salary_slip_file.filename
         )
 
         file_extension = os.path.splitext(
+
             original_filename
         )[1]
 
@@ -111,28 +122,25 @@ def parse_resume():
         # SAVE FILE
         # ==========================================
 
-        resume_file.save(file_path)
+        salary_slip_file.save(
 
-        # ==========================================
-        # PARSE RESUME
-        # ==========================================
-
-        from services.resume_verification_service import (
-            ResumeVerificationService
+            file_path
         )
 
         # ==========================================
-        # PARSE RESUME
+        # VERIFY SALARY SLIP
         # ==========================================
 
         result = (
-            ResumeVerificationService.process_resume(
+            SalarySlipService
+            .verify_salary_slip(
 
-                file=file_path,
+                file_path=file_path,
 
                 candidate_id=candidate_id
             )
         )
+
         # ==========================================
         # API FAILURE
         # ==========================================
@@ -149,10 +157,6 @@ def parse_resume():
 
                 "error": result.get(
                     "error"
-                ),
-
-                "provider_response": result.get(
-                    "provider_response"
                 )
             }), 400
 
@@ -164,7 +168,9 @@ def parse_resume():
 
             "success": True,
 
-            "message": "Resume parsed successfully",
+            "message": (
+                "Salary slip verified successfully"
+            ),
 
             "data": result
         }), 200
@@ -175,7 +181,9 @@ def parse_resume():
 
             "success": False,
 
-            "message": "Resume parsing failed",
+            "message": (
+                "Salary slip verification failed"
+            ),
 
             "error": str(e)
         }), 500

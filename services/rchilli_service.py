@@ -4,10 +4,13 @@ import requests
 import os
 from config import Config
 
+from repositories.api_log_repository import ApiLogRepository
 from repositories.candidate_repository import (
     CandidateRepository
 )
-
+from repositories.api_log_repository import (
+    ApiLogRepository
+)
 from repositories.verification_repository import (
     VerificationRepository
 )
@@ -70,7 +73,14 @@ class RChilliService:
             )
 
             response_data = response.json()
-
+            ApiLogRepository.save_log(
+            provider_name="RChilli",
+            api_name="Resume Parser",
+            request_data=payload,
+            response_data=response_data,
+            status_code=response.status_code,
+            status="SUCCESS"
+            )
             # ==========================================
             # VALIDATE RESPONSE
             # ==========================================
@@ -303,6 +313,20 @@ class RChilliService:
             }
 
         except Exception as e:
+            ApiLogRepository.save_log(
+
+                provider_name="RChilli",
+
+                api_name="Resume Parser",
+
+                request_data={},
+
+                response_data=str(e),
+
+                status_code=500,
+
+                status="FAILED"
+            )
 
             return {
 

@@ -42,7 +42,7 @@ class ResumeVerificationService:
             result = (
                 RChilliService.parse_resume(
 
-                    file=file,
+                    file_path=file,
 
                     candidate_id=candidate_id
                 )
@@ -99,19 +99,20 @@ class ResumeVerificationService:
             # ==========================================
             # SAVE PARSED RESULT
             # ==========================================
-
             VerificationRepository.save_resume_parsing_result(
 
                 candidate_id=candidate_id,
+
+                verification_id=verification_id,
 
                 parsed_data=json.dumps(
                     candidate_profile
                 ),
 
-                skills=str(
+                skills=json.dumps(
                     candidate_profile.get(
                         "skills",
-                        ""
+                        []
                     )
                 ),
 
@@ -127,16 +128,16 @@ class ResumeVerificationService:
                         "Qualification",
                         ""
                     )
-                ),
+            ),
 
-                parsing_status="SUCCESS",
+            parsing_status="SUCCESS",
 
-                parser_provider="RChilli",
+            parser_provider="RChilli",
 
-                raw_response=json.dumps(
-                    parsed_result
-                )
+            raw_response=json.dumps(
+                parsed_result
             )
+        )
             
             # ==========================================
             # MARK COMPLETED

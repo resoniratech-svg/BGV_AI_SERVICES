@@ -110,7 +110,7 @@ class Config:
     RCHILLI_SUBUSER_ID = os.getenv(
         "RCHILLI_SUBUSER_ID"
     )
-    # ==========================================
+# ==========================================
 # DILISENSE AML CONFIG
 # ==========================================
 
@@ -132,6 +132,14 @@ class Config:
             60
         )
     )
+    INDIANKANOON_API_TOKEN = os.getenv(
+        "INDIANKANOON_API_TOKEN"
+    )
+
+    INDIANKANOON_BASE_URL = os.getenv(
+        "INDIANKANOON_BASE_URL"
+    )
+
 # ==========================================
 # TESSERACT
 # ==========================================

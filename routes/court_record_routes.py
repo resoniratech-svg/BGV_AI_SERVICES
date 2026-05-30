@@ -2,24 +2,25 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 
-from services.aml_service import (
-    AMLService
+from services.court_record_service import (
+    CourtRecordService
 )
 
-dilisense_bp = Blueprint(
+court_record_bp = Blueprint(
 
-    "dilisense_bp",
+    "court_record_bp",
+
     __name__
 )
 
 
-@dilisense_bp.route(
+@court_record_bp.route(
 
-    "/watchlist/screen",
+    "/court-record/search",
 
     methods=["POST"]
 )
-def screen_watchlist():
+def search_court_records():
 
     try:
 
@@ -33,17 +34,15 @@ def screen_watchlist():
             "full_name"
         )
 
-        country = data.get(
-            "country"
-        )
-
         if not candidate_id:
 
             return jsonify({
 
                 "success": False,
 
-                "message": "candidate_id required"
+                "message": (
+                    "candidate_id required"
+                )
             }), 400
 
         if not full_name:
@@ -52,16 +51,19 @@ def screen_watchlist():
 
                 "success": False,
 
-                "message": "full_name required"
+                "message": (
+                    "full_name required"
+                )
             }), 400
 
-        result = AMLService.screen_candidate(
+        result = (
+            CourtRecordService
+            .search_court_records(
 
-            candidate_id=candidate_id,
+                candidate_id=candidate_id,
 
-            full_name=full_name,
-
-            country=country
+                full_name=full_name
+            )
         )
 
         return jsonify(result)
@@ -72,5 +74,9 @@ def screen_watchlist():
 
             "success": False,
 
-            "message": str(e)
+            "message": (
+                "Court record API failed"
+            ),
+
+            "error": str(e)
         }), 500

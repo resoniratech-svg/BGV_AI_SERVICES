@@ -19,93 +19,50 @@ class WatchlistRepository:
         raw_response
     ):
 
-        connection = get_connection()
+        try:
 
-        cursor = connection.cursor()
+            print("WATCHLIST INSERT STARTED")
 
-        query = """
-            INSERT INTO watchlist_results (
+            connection = get_connection()
 
-                candidate_id,
-                verification_id,
-                full_name,
-                country,
-                aml_status,
-                risk_level,
-                pep_match,
-                sanctions_match,
-                adverse_media_match,
-                provider_name,
-                raw_response
+            print("DB CONNECTED")
 
-            )
+            cursor = connection.cursor()
 
-            VALUES (
+            query = """
+                INSERT INTO watchlist_results (
 
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s
-            )
-        """
+                    candidate_id,
+                    verification_id,
+                    full_name,
+                    country,
+                    aml_status,
+                    risk_level,
+                    pep_match,
+                    sanctions_match,
+                    adverse_media_match,
+                    provider_name,
+                    raw_response
 
-        values = (
+                )
 
-            candidate_id,
-            verification_id,
-            full_name,
-            country,
-            aml_status,
-            risk_level,
-            pep_match,
-            sanctions_match,
-            adverse_media_match,
-            provider_name,
-            raw_response
-        )
+                VALUES (
 
-        cursor.execute(
-            query,
-            values
-        )
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
+            """
 
-        connection.commit()
-
-        cursor.close()
-
-        connection.close()
-
-    @staticmethod
-    def save_watchlist_result(
-
-        candidate_id,
-        verification_id,
-        full_name,
-        country,
-        aml_status,
-        risk_level,
-        pep_match,
-        sanctions_match,
-        adverse_media_match,
-        provider_name,
-        raw_response
-    ):
-
-        print("WATCHLIST INSERT STARTED")
-
-        connection = get_connection()
-
-        cursor = connection.cursor()
-
-        query = """
-            INSERT INTO watchlist_results (
+            values = (
 
                 candidate_id,
                 verification_id,
@@ -118,53 +75,25 @@ class WatchlistRepository:
                 adverse_media_match,
                 provider_name,
                 raw_response
-
             )
 
-            VALUES (
+            print("VALUES:", values)
 
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s
+            cursor.execute(
+                query,
+                values
             )
-        """
 
-        values = (
+            print("WATCHLIST INSERT EXECUTED")
 
-            candidate_id,
-            verification_id,
-            full_name,
-            country,
-            aml_status,
-            risk_level,
-            pep_match,
-            sanctions_match,
-            adverse_media_match,
-            provider_name,
-            raw_response
-        )
+            connection.commit()
 
-        cursor.execute(
-            query,
-            values
-        )
+            print("WATCHLIST INSERT COMMITTED")
 
-        print("WATCHLIST INSERT EXECUTED")
+            cursor.close()
 
-        connection.commit()
+            connection.close()
 
-        print("WATCHLIST INSERT COMMITTED")
+        except Exception as e:
 
-        cursor.close()
-
-        connection.close()
-
-    
+            print("WATCHLIST INSERT ERROR:", str(e))

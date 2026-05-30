@@ -18,6 +18,15 @@ from routes.rchilli_routes import (
 from routes.dilisense_routes import (
     dilisense_bp
 )
+from routes.indiankanoon_routes import (
+    indiankanoon_bp
+)
+from routes.court_record_routes import (
+    court_record_bp
+)
+from routes.salary_slip_routes import (
+    salary_slip_bp
+)
 app = Flask(__name__)
 # JWT Configuration
 app.config["JWT_SECRET_KEY"] = Config.JWT_SECRET_KEY
@@ -61,6 +70,24 @@ app.register_blueprint(
 app.register_blueprint(
 
     dilisense_bp,
+
+    url_prefix="/api/v1"
+)
+app.register_blueprint(
+
+    indiankanoon_bp,
+
+    url_prefix="/api/v1"
+)
+app.register_blueprint(
+
+    court_record_bp,
+
+    url_prefix="/api/v1"
+)
+app.register_blueprint(
+
+    salary_slip_bp,
 
     url_prefix="/api/v1"
 )

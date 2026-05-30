@@ -142,8 +142,11 @@ class VerificationRepository:
             candidate_id,
             raw_data
         )
+
         print("SAVE METHOD CALLED")
+
         print(values)
+
         cursor.execute(
 
             query,
@@ -160,6 +163,7 @@ class VerificationRepository:
     def save_resume_parsing_result(
 
         candidate_id,
+        verification_id,
         parsed_data,
         skills,
         experience_years,
@@ -177,6 +181,7 @@ class VerificationRepository:
             INSERT INTO resume_parsing_results (
 
                 candidate_id,
+                verification_id,
                 parsed_data,
                 skills,
                 experience_years,
@@ -196,6 +201,7 @@ class VerificationRepository:
                 %s,
                 %s,
                 %s,
+                %s,
                 %s
             )
         """
@@ -203,6 +209,7 @@ class VerificationRepository:
         values = (
 
             candidate_id,
+            verification_id,
             parsed_data,
             skills,
             experience_years,

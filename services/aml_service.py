@@ -22,6 +22,8 @@ class AMLService:
         country
     ):
 
+        verification_id = None
+
         try:
 
             # ==========================================
@@ -41,6 +43,7 @@ class AMLService:
 
             url = (
                 f"{Config.DILISENSE_BASE_URL}"
+                f"/checkIndividual"
             )
 
             # ==========================================
@@ -49,59 +52,94 @@ class AMLService:
 
             headers = {
 
-                "Authorization": (
-                    f"Bearer "
-                    f"{Config.DILISENSE_API_KEY}"
-                ),
-
-                "Content-Type": (
-                    "application/json"
+                "x-api-key": (
+                    Config.DILISENSE_API_KEY
                 )
             }
 
             # ==========================================
-            # PAYLOAD
+            # PARAMS
             # ==========================================
 
-            payload = {
+            params = {
 
-                "name": full_name,
+                "names": full_name,
 
-                "country": country
+                "fuzzy_search": 1
             }
+
+            if country:
+
+                params["country"] = country
 
             # ==========================================
             # API CALL
             # ==========================================
 
-            response = requests.post(
+            response = requests.get(
 
                 url,
 
                 headers=headers,
 
-                json=payload,
+                params=params,
 
                 timeout=Config.DILISENSE_TIMEOUT
             )
+
+            response.raise_for_status()
 
             response_data = (
                 response.json()
             )
 
             # ==========================================
-            # SAMPLE EXTRACTION
+            # AML RESULT EXTRACTION
             # ==========================================
 
-            aml_status = "CLEAR"
+            matches = response_data.get(
+                "matches",
+                []
+            )
 
-            risk_level = "LOW"
+            aml_status = (
+                "MATCH_FOUND"
+                if matches
+                else "CLEAR"
+            )
+
+            risk_level = (
+                "HIGH"
+                if matches
+                else "LOW"
+            )
 
             pep_match = False
 
             sanctions_match = False
 
             adverse_media_match = False
+
+            for match in matches:
+
+                source_type = str(
+                    match.get(
+                        "source_type",
+                        ""
+                    )
+                ).upper()
+
+                if "PEP" in source_type:
+
+                    pep_match = True
+
+                if "SANCTION" in source_type:
+
+                    sanctions_match = True
+
+                if "CRIMINAL" in source_type:
+
+                    adverse_media_match = True
 
             # ==========================================
             # SAVE RESULT
@@ -129,7 +167,7 @@ class AMLService:
 
                 adverse_media_match=adverse_media_match,
 
-                provider_name="Dilisense",
+                provider_name="DILISENSE",
 
                 raw_response=json.dumps(
                     response_data
@@ -183,6 +221,14 @@ class AMLService:
             }
 
         except Exception as e:
+
+            print("AML ERROR:", str(e))
+
+            if verification_id:
+
+                VerificationService.mark_verification_failed(
+                    verification_id
+                )
 
             return {
 

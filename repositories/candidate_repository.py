@@ -98,7 +98,7 @@ class CandidateRepository:
             INSERT INTO resume_raw_data (
 
                 candidate_id,
-                raw_json
+                raw_data
 
             )
 
@@ -122,3 +122,57 @@ class CandidateRepository:
         cursor.close()
 
         connection.close()
+        @staticmethod
+        def save_resume_api_log(
+
+            candidate_id,
+            api_provider,
+            request_payload,
+            response_payload,
+            status
+        ):
+
+            connection = get_connection()
+
+            cursor = connection.cursor()
+
+            query = """
+                INSERT INTO resume_api_logs (
+
+                    candidate_id,
+                    api_provider,
+                    request_payload,
+                    response_payload,
+                    status
+
+                )
+
+                VALUES (
+
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
+            """
+
+            values = (
+
+                candidate_id,
+                api_provider,
+                request_payload,
+                response_payload,
+                status
+            )
+
+            cursor.execute(
+                query,
+                values
+            )
+
+            connection.commit()
+
+            cursor.close()
+
+            connection.close()
