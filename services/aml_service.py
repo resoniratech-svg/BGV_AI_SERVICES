@@ -142,12 +142,10 @@ class AMLService:
                     adverse_media_match = True
 
             # ==========================================
-            # SAVE RESULT
+            # SAVE AML SCREENING RESULT
             # ==========================================
 
-            print("WATCHLIST INSERT STARTED")
-
-            WatchlistRepository.save_watchlist_result(
+            WatchlistRepository.save_aml_screening_result(
 
                 candidate_id=candidate_id,
 
@@ -174,7 +172,36 @@ class AMLService:
                 )
             )
 
-            print("WATCHLIST INSERT EXECUTED")
+            # ==========================================
+            # SAVE GLOBAL WATCHLIST RESULT
+            # ==========================================
+
+            WatchlistRepository.save_global_watchlist_result(
+
+                candidate_id=candidate_id,
+
+                verification_id=verification_id,
+
+                full_name=full_name,
+
+                country=country,
+
+                aml_status=aml_status,
+
+                risk_level=risk_level,
+
+                pep_match=pep_match,
+
+                sanctions_match=sanctions_match,
+
+                adverse_media_match=adverse_media_match,
+
+                provider_name="DILISENSE",
+
+                raw_response=json.dumps(
+                    response_data
+                )
+            )
 
             # ==========================================
             # MARK COMPLETED
@@ -184,8 +211,6 @@ class AMLService:
 
                 verification_id
             )
-
-            print("WATCHLIST INSERT COMMITTED")
 
             # ==========================================
             # FINAL RESPONSE
@@ -301,7 +326,34 @@ class AMLService:
         response_data
     ):
 
-        WatchlistRepository.save_watchlist_result(
+        WatchlistRepository.save_aml_screening_result(
+
+            candidate_id=candidate_id,
+
+            verification_id=verification_id,
+
+            full_name=full_name,
+
+            country=country,
+
+            aml_status="CLEAR",
+
+            risk_level="LOW",
+
+            pep_match=False,
+
+            sanctions_match=False,
+
+            adverse_media_match=False,
+
+            provider_name="DILISENSE",
+
+            raw_response=json.dumps(
+                response_data
+            )
+        )
+
+        WatchlistRepository.save_global_watchlist_result(
 
             candidate_id=candidate_id,
 

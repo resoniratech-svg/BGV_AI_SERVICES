@@ -27,6 +27,9 @@ from routes.court_record_routes import (
 from routes.salary_slip_routes import (
     salary_slip_bp
 )
+from routes.report_routes import (
+    report_bp
+)
 app = Flask(__name__)
 # JWT Configuration
 app.config["JWT_SECRET_KEY"] = Config.JWT_SECRET_KEY
@@ -88,6 +91,12 @@ app.register_blueprint(
 app.register_blueprint(
 
     salary_slip_bp,
+
+    url_prefix="/api/v1"
+)
+app.register_blueprint(
+
+    report_bp,
 
     url_prefix="/api/v1"
 )
