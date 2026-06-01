@@ -4,25 +4,25 @@ from flask import jsonify
 
 import os
 import uuid
-from services.resume_verification_service import (
-    ResumeVerificationService
-)
+
 from werkzeug.utils import secure_filename
 
 from config import Config
 
-from services.rchilli_service import (
-    RChilliService
+from services.resume_verification_service import (
+    ResumeVerificationService
 )
-from services.resume_verification_service import ResumeVerificationService
+
 
 rchilli_bp = Blueprint(
+
     "rchilli_bp",
     __name__
 )
 
 
 @rchilli_bp.route(
+
     "/resume/parse",
     methods=["POST"]
 )
@@ -44,6 +44,15 @@ def parse_resume():
             }), 400
 
         resume_file = request.files["resume"]
+
+        if not resume_file:
+
+            return jsonify({
+
+                "success": False,
+
+                "message": "Resume file missing"
+            }), 400
 
         if resume_file.filename == "":
 
@@ -72,16 +81,63 @@ def parse_resume():
             }), 400
 
         # ==========================================
+        # CONVERT CANDIDATE ID
+        # ==========================================
+
+        try:
+
+            candidate_id = int(
+                candidate_id
+            )
+
+        except Exception:
+
+            return jsonify({
+
+                "success": False,
+
+                "message": "Invalid candidate_id"
+            }), 400
+
+        # ==========================================
         # SECURE FILE NAME
         # ==========================================
 
         original_filename = secure_filename(
+
             resume_file.filename
         )
 
         file_extension = os.path.splitext(
+
             original_filename
-        )[1]
+        )[1].lower()
+
+        # ==========================================
+        # ALLOWED FILE TYPES
+        # ==========================================
+
+        allowed_extensions = [
+
+            ".pdf",
+            ".doc",
+            ".docx"
+        ]
+
+        if file_extension not in allowed_extensions:
+
+            return jsonify({
+
+                "success": False,
+
+                "message": (
+                    "Only PDF, DOC and DOCX files are allowed"
+                )
+            }), 400
+
+        # ==========================================
+        # GENERATE UNIQUE FILE NAME
+        # ==========================================
 
         unique_filename = (
 
@@ -100,6 +156,10 @@ def parse_resume():
             exist_ok=True
         )
 
+        # ==========================================
+        # FINAL FILE PATH
+        # ==========================================
+
         file_path = os.path.join(
 
             Config.UPLOAD_FOLDER,
@@ -111,18 +171,12 @@ def parse_resume():
         # SAVE FILE
         # ==========================================
 
-        resume_file.save(file_path)
-
-        # ==========================================
-        # PARSE RESUME
-        # ==========================================
-
-        from services.resume_verification_service import (
-            ResumeVerificationService
+        resume_file.save(
+            file_path
         )
 
         # ==========================================
-        # PARSE RESUME
+        # PROCESS RESUME
         # ==========================================
 
         result = (
@@ -133,8 +187,9 @@ def parse_resume():
                 candidate_id=candidate_id
             )
         )
+
         # ==========================================
-        # API FAILURE
+        # HANDLE FAILURE
         # ==========================================
 
         if not result.get("success"):
@@ -164,7 +219,9 @@ def parse_resume():
 
             "success": True,
 
-            "message": "Resume parsed successfully",
+            "message": (
+                "Resume parsed successfully"
+            ),
 
             "data": result
         }), 200
@@ -175,7 +232,9 @@ def parse_resume():
 
             "success": False,
 
-            "message": "Resume parsing failed",
+            "message": (
+                "Resume parsing failed"
+            ),
 
             "error": str(e)
         }), 500

@@ -1,5 +1,7 @@
 from db import get_connection
 
+import json
+
 
 class CandidateRepository:
 
@@ -13,6 +15,7 @@ class CandidateRepository:
         query = """
             INSERT INTO parsed_candidates (
 
+                candidate_id,
                 full_name,
                 email,
                 phone,
@@ -22,15 +25,28 @@ class CandidateRepository:
                 country,
                 skills,
                 experience_years,
+                total_experience_months,
+                highest_qualification,
+                current_location,
+                preferred_location,
+                github_url,
+                portfolio_url,
+                resume_file_name,
+                resume_score,
                 current_company,
-                designation
+                designation,
+                parser_provider,
+                parsing_status
 
             )
 
             VALUES (
 
                 %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s
             )
         """
 
@@ -44,6 +60,8 @@ class CandidateRepository:
             skills = ",".join(skills)
 
         values = (
+
+            candidate.get("candidate_id"),
 
             candidate.get("full_name"),
 
@@ -63,9 +81,49 @@ class CandidateRepository:
 
             candidate.get("experience_years"),
 
-            candidate.get("current_company"),
+            candidate.get(
+                "total_experience_months"
+            ),
 
-            candidate.get("designation")
+            candidate.get(
+                "highest_qualification"
+            ),
+
+            candidate.get(
+                "current_location"
+            ),
+
+            candidate.get(
+                "preferred_location"
+            ),
+
+            candidate.get(
+                "github_url"
+            ),
+
+            candidate.get(
+                "portfolio_url"
+            ),
+
+            candidate.get(
+                "resume_file_name"
+            ),
+
+            candidate.get(
+                "resume_score"
+            ),
+
+            candidate.get(
+                "current_company"
+            ),
+
+            candidate.get(
+                "designation"
+            ),
+
+            "RCHILLI",
+
+            "PARSED"
         )
 
         cursor.execute(
@@ -75,17 +133,19 @@ class CandidateRepository:
 
         connection.commit()
 
-        candidate_id = cursor.lastrowid
+        parsed_candidate_id = (
+            cursor.lastrowid
+        )
 
         cursor.close()
 
         connection.close()
 
-        return candidate_id
-
+        return parsed_candidate_id
 
     @staticmethod
     def save_raw_resume_data(
+
         candidate_id,
         raw_data
     ):
@@ -102,14 +162,18 @@ class CandidateRepository:
 
             )
 
-            VALUES (%s, %s)
+            VALUES (
+
+                %s,
+                %s
+            )
         """
 
         values = (
 
             candidate_id,
 
-            str(raw_data)
+            json.dumps(raw_data)
         )
 
         cursor.execute(
@@ -122,57 +186,62 @@ class CandidateRepository:
         cursor.close()
 
         connection.close()
-        @staticmethod
-        def save_resume_api_log(
 
-            candidate_id,
-            api_provider,
-            request_payload,
-            response_payload,
-            status
-        ):
+    @staticmethod
+    def save_resume_api_log(
 
-            connection = get_connection()
+        candidate_id,
+        api_provider,
+        request_payload,
+        response_payload,
+        status
+    ):
 
-            cursor = connection.cursor()
+        connection = get_connection()
 
-            query = """
-                INSERT INTO resume_api_logs (
+        cursor = connection.cursor()
 
-                    candidate_id,
-                    api_provider,
-                    request_payload,
-                    response_payload,
-                    status
-
-                )
-
-                VALUES (
-
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    %s
-                )
-            """
-
-            values = (
+        query = """
+            INSERT INTO resume_api_logs (
 
                 candidate_id,
                 api_provider,
                 request_payload,
                 response_payload,
                 status
+
             )
 
-            cursor.execute(
-                query,
-                values
+            VALUES (
+
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
             )
+        """
 
-            connection.commit()
+        values = (
 
-            cursor.close()
+            candidate_id,
 
-            connection.close()
+            api_provider,
+
+            json.dumps(request_payload),
+
+            json.dumps(response_payload),
+
+            status
+        )
+
+        cursor.execute(
+            query,
+            values
+        )
+
+        connection.commit()
+
+        cursor.close()
+
+        connection.close()
