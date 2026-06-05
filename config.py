@@ -33,11 +33,7 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = int(
         os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 3600)
     )
-
-    # ==========================================
-    # DIDIT CONFIG
-    # ==========================================
-    # ==========================================
+# ==========================================
 # DIDIT CONFIG
 # ==========================================
 
@@ -60,7 +56,7 @@ class Config:
     DIDIT_WEBHOOK_URL = os.getenv(
         "DIDIT_WEBHOOK_URL"
     )
-        # ==========================================
+    # ==========================================
     # MYSQL CONFIG
     # ==========================================
 
@@ -87,14 +83,6 @@ class Config:
 # RCHILLI CONFIG
 # ==========================================
 
-    # ==========================================
-# RCHILLI CONFIG
-# ==========================================
-
-    # ==========================================
-# RCHILLI CONFIG
-# ==========================================
-
     RCHILLI_API_URL = os.getenv(
         "RCHILLI_API_URL"
     )
@@ -110,11 +98,8 @@ class Config:
     RCHILLI_SUBUSER_ID = os.getenv(
         "RCHILLI_SUBUSER_ID"
     )
-# ==========================================
-# DILISENSE AML CONFIG
-# ==========================================
 
-    # ==========================================
+# ==========================================
 # DILISENSE CONFIG
 # ==========================================
 
@@ -139,7 +124,25 @@ class Config:
     INDIANKANOON_BASE_URL = os.getenv(
         "INDIANKANOON_BASE_URL"
     )
+    # ==========================================
+    # GRIDLINES
+    # ==========================================
 
+    GRIDLINES_ENV = os.getenv(
+        "GRIDLINES_ENV"
+    )
+
+    GRIDLINES_SANDBOX_URL = os.getenv(
+        "GRIDLINES_SANDBOX_URL"
+    )
+
+    GRIDLINES_PRODUCTION_URL = os.getenv(
+        "GRIDLINES_PRODUCTION_URL"
+    )
+
+    GRIDLINES_API_KEY = os.getenv(
+        "GRIDLINES_API_KEY"
+    )
 # ==========================================
 # TESSERACT
 # ==========================================

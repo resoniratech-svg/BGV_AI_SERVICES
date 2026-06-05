@@ -12,24 +12,24 @@ didit_bp = Blueprint(
 )
 
 
-@didit_bp.route(
-    "/didit/create-session",
-    methods=["POST"]
-)
-def create_didit_session():
+#@didit_bp.route(
+    #"/didit/create-session",
+    #methods=["POST"]
+#)
+#def create_didit_session():
 
-    data = request.get_json()
+    #data = request.get_json()
 
-    result = DiditService.create_session(
+    #result = DiditService.create_session(
 
-    workflow_id=data["workflow_id"],
+    #workflow_id=data["workflow_id"],
 
-    candidate_id=data["candidate_id"],
+    #candidate_id=data["candidate_id"],
 
-    callback_url=Config.DIDIT_WEBHOOK_URL,
+    #callback_url=Config.DIDIT_WEBHOOK_URL,
 
-    verification_type=data["verification_type"]
+    #verification_type=data["verification_type"]
     
-)
+#)
 
-    return jsonify(result), 200
+    #return jsonify(result), 200

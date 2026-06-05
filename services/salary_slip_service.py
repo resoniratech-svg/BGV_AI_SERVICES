@@ -104,6 +104,11 @@ class SalarySlipService:
                     file_path
                 )
             )
+            print("\n===== SALARY OCR OUTPUT =====\n")
+
+            print(raw_text)
+
+            print("\n=============================\n")
 
             # ==========================================
             # EMPTY OCR CHECK
@@ -131,14 +136,15 @@ class SalarySlipService:
 
             pan_match = re.search(
 
-                r"[A-Z]{5}[0-9]{4}[A-Z]",
+                r"\b[A-Z]{5}[0-9]{4}[A-Z]\b",
 
-                raw_text
+                raw_text,
+                re.IGNORECASE
             )
 
             pan_number = (
 
-                pan_match.group(0)
+                pan_match.group(0).upper()
 
                 if pan_match
 

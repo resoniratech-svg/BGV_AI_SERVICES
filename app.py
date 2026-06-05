@@ -30,6 +30,16 @@ from routes.salary_slip_routes import (
 from routes.report_routes import (
     report_bp
 )
+from routes.driving_license_routes import (
+    driving_license_bp
+)
+
+from routes.passport_routes import (
+    passport_bp
+)
+from routes.document_routes import (
+    document_bp
+)
 app = Flask(__name__)
 # JWT Configuration
 app.config["JWT_SECRET_KEY"] = Config.JWT_SECRET_KEY
@@ -98,6 +108,20 @@ app.register_blueprint(
 
     report_bp,
 
+    url_prefix="/api/v1"
+)
+app.register_blueprint(
+    passport_bp,
+    url_prefix="/api/v1"
+)
+
+app.register_blueprint(
+    driving_license_bp,
+    url_prefix="/api/v1"
+)
+
+app.register_blueprint(
+    document_bp,
     url_prefix="/api/v1"
 )
 # LOGIN API
