@@ -9,9 +9,11 @@ class SalarySlipRepository:
         candidate_id,
         verification_id,
         employee_name,
+        employee_id,
         designation,
         salary_amount,
         net_salary,
+        gross_salary,
         pan_number,
         uan_number,
         bank_account_last4,
@@ -33,9 +35,11 @@ class SalarySlipRepository:
                 candidate_id,
                 verification_id,
                 employee_name,
+                employee_id,
                 designation,
                 salary_amount,
                 net_salary,
+                gross_salary,
                 pan_number,
                 uan_number,
                 bank_account_last4,
@@ -64,6 +68,8 @@ class SalarySlipRepository:
                 %s,
                 %s,
                 %s,
+                %s,
+                %s,
                 %s
             )
         """
@@ -73,9 +79,11 @@ class SalarySlipRepository:
             candidate_id,
             verification_id,
             employee_name,
+            employee_id,
             designation,
             salary_amount,
             net_salary,
+            gross_salary,
             pan_number,
             uan_number,
             bank_account_last4,
@@ -269,50 +277,6 @@ class SalarySlipRepository:
             response_payload,
             processing_status,
             error_message
-        )
-
-        cursor.execute(query, values)
-
-        connection.commit()
-
-        cursor.close()
-
-        connection.close()
-
-    @staticmethod
-    def save_ocr_page(
-
-        salary_slip_id,
-        page_number,
-        extracted_text
-    ):
-
-        connection = get_connection()
-
-        cursor = connection.cursor()
-
-        query = """
-            INSERT INTO salary_slip_ocr_pages (
-
-                salary_slip_id,
-                page_number,
-                extracted_text
-
-            )
-
-            VALUES (
-
-                %s,
-                %s,
-                %s
-            )
-        """
-
-        values = (
-
-            salary_slip_id,
-            page_number,
-            extracted_text
         )
 
         cursor.execute(query, values)

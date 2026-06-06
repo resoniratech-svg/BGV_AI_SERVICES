@@ -155,46 +155,113 @@ class SalarySlipService:
             # UAN EXTRACTION
             # ==========================================
 
-            uan_match = re.search(
+            uan_number = None
 
-                r"\b\d{12}\b",
+            uan_patterns = [
 
-                raw_text
-            )
+                r"UAN\s*Number\s*[:\-]?\s*(\d{12})",
 
-            uan_number = (
+                r"UAN\s*[:\-]?\s*(\d{12})",
 
-                uan_match.group(0)
+                r"\b(\d{12})\b"
+            ]
 
-                if uan_match
+            for pattern in uan_patterns:
 
-                else None
-            )
+                match = re.search(
+                    pattern,
+                    raw_text,
+                    re.IGNORECASE
+                )
+                
+                if match:
+
+                    uan_number = (
+                        match.group(1)
+                    )
+
+                    break
 
             # ==========================================
             # NET SALARY EXTRACTION
             # ==========================================
 
-            salary_match = re.search(
+            salary_amount = None
 
-                r"(?:Net Salary|Take Home|Net Pay)[^\d]*(\d[\d,]*)",
+            salary_patterns = [
 
-                raw_text,
+                r"Net Salary\s*[:\-]?\s*([\d,]+)",
 
-                re.IGNORECASE
-            )
+                r"Net Pay\s*[:\-]?\s*([\d,]+)",
 
-            salary_amount = (
+                r"Take Home\s*[:\-]?\s*([\d,]+)",
 
-                salary_match.group(1).replace(",", "")
+                r"Salary\s*[:\-]?\s*([\d,]+)"
+            ]
 
-                if salary_match
+            for pattern in salary_patterns:
 
-                else None
-            )
+                match = re.search(
+
+                    pattern,
+
+                    raw_text,
+
+                    re.IGNORECASE
+                )
+
+                if match:
+
+                    salary_amount = (
+
+                        match.group(1)
+
+                        .replace(",", "")
+
+                        .strip()
+                    )
+
+                    break
 
             net_salary = salary_amount
+            # ==========================================
+            # GROSS SALARY EXTRACTION
+            # ==========================================
 
+            gross_salary = None
+
+            gross_salary_patterns = [
+
+                r"Gross Salary\s*[:\-]?\s*([\d,]+)",
+
+                r"Gross Pay\s*[:\-]?\s*([\d,]+)",
+
+                r"Gross Earnings\s*[:\-]?\s*([\d,]+)"
+            ]
+
+            for pattern in gross_salary_patterns:
+
+                match = re.search(
+
+                    pattern,
+
+                    raw_text,
+
+                    re.IGNORECASE
+                )
+
+                if match:
+
+                    gross_salary = (
+
+                        match.group(1)
+
+                        .replace(",", "")
+
+                        .strip()
+                    )
+
+                    break
             # ==========================================
             # EMPLOYEE NAME EXTRACTION
             # ==========================================
@@ -203,9 +270,11 @@ class SalarySlipService:
 
             employee_patterns = [
 
-                r"Employee Name[\s:\-]+([A-Za-z ]+)",
-                r"Name[\s:\-]+([A-Za-z ]+)",
-                r"Employee[\s:\-]+([A-Za-z ]+)"
+                r"Employee Name\s*[:\-]?\s*([A-Za-z ]+)",
+
+                r"Name\s*[:\-]?\s*([A-Za-z ]+)",
+
+                r"Employee\s*[:\-]?\s*([A-Za-z ]+)"
             ]
 
             for pattern in employee_patterns:
@@ -213,18 +282,60 @@ class SalarySlipService:
                 match = re.search(
 
                     pattern,
+
                     raw_text,
+
                     re.IGNORECASE
                 )
 
                 if match:
 
                     employee_name = (
-                        match.group(1).strip()
+
+                        match.group(1)
+
+                        .strip()
+
+                        .split("\n")[0]
                     )
 
                     break
+            
+            # ==========================================
+            # EMPLOYEE ID EXTRACTION
+            # ==========================================
 
+            employee_id = None
+
+            employee_id_patterns = [
+
+                r"Employee\s*ID\s*[:\-]?\s*([A-Z0-9]+)",
+
+                r"Emp\s*ID\s*[:\-]?\s*([A-Z0-9]+)"
+            ]
+
+            for pattern in employee_id_patterns:
+
+                match = re.search(
+
+                    pattern,
+
+                    raw_text,
+
+                    re.IGNORECASE
+                )
+
+                if match:
+
+                    employee_id = (
+                        match.group(1)
+                        .strip()
+                    )
+                    print(
+                        "EMPLOYEE ID =",
+                        employee_id
+                    )
+                    break
             # ==========================================
             # DESIGNATION EXTRACTION
             # ==========================================
@@ -233,10 +344,11 @@ class SalarySlipService:
 
             designation_patterns = [
 
-                r"Designation[\s:\-]+([A-Za-z ]+)",
-                r"Role[\s:\-]+([A-Za-z ]+)",
-                r"Position[\s:\-]+([A-Za-z ]+)",
-                r"Department[\s:\-]+([A-Za-z ]+)"
+                r"Designation\s*[:\-]?\s*(.+)",
+
+                r"Role\s*[:\-]?\s*(.+)",
+
+                r"Position\s*[:\-]?\s*(.+)"
             ]
 
             for pattern in designation_patterns:
@@ -244,18 +356,24 @@ class SalarySlipService:
                 match = re.search(
 
                     pattern,
+
                     raw_text,
+
                     re.IGNORECASE
                 )
 
                 if match:
 
                     designation = (
-                        match.group(1).strip()
+
+                        match.group(1)
+
+                        .strip()
+
+                        .split("\n")[0]
                     )
 
                     break
-
             # ==========================================
             # BANK ACCOUNT EXTRACTION
             # ==========================================
@@ -264,9 +382,11 @@ class SalarySlipService:
 
             bank_patterns = [
 
-                r"Account Number[^\d]*(\d{4,})",
-                r"A/C Number[^\d]*(\d{4,})",
-                r"Bank Account[^\d]*(\d{4,})"
+                r"Bank Account\s*([A-ZXx\d]+)",
+
+                r"Account Number\s*([A-ZXx\d]+)",
+
+                r"A/C Number\s*([A-ZXx\d]+)"
             ]
 
             for pattern in bank_patterns:
@@ -274,18 +394,32 @@ class SalarySlipService:
                 match = re.search(
 
                     pattern,
+
                     raw_text,
+
                     re.IGNORECASE
                 )
 
                 if match:
 
-                    bank_account_last4 = (
-                        match.group(1)[-4:]
+                    account_text = (
+                        match.group(1)
                     )
 
-                    break
+                    digits = re.findall(
+                        r"\d",
+                        account_text
+                    )
 
+                    if len(digits) >= 4:
+
+                        bank_account_last4 = (
+                            "".join(
+                                digits[-4:]
+                            )
+                        )
+
+                    break
             # ==========================================
             # FRAUD CHECKS
             # ==========================================
@@ -339,6 +473,8 @@ class SalarySlipService:
                     verification_id=verification_id,
 
                     employee_name=employee_name,
+                    employee_id=employee_id,
+                    gross_salary=gross_salary,
 
                     designation=designation,
 
@@ -368,19 +504,7 @@ class SalarySlipService:
                 )
             )
 
-            # ==========================================
-            # SAVE OCR PAGE
-            # ==========================================
-
-            SalarySlipRepository.save_ocr_page(
-
-                salary_slip_id=salary_slip_id,
-
-                page_number=1,
-
-                extracted_text=raw_text
-            )
-
+            
             # ==========================================
             # FRAUD STATUS
             # ==========================================
@@ -512,7 +636,9 @@ class SalarySlipService:
                     "employee_name": (
                         employee_name
                     ),
-
+                    "employee_id": (
+                        employee_id
+                    ),
                     "designation": (
                         designation
                     ),
@@ -520,7 +646,9 @@ class SalarySlipService:
                     "salary_amount": (
                         salary_amount
                     ),
-
+                    "gross_salary": (
+                        gross_salary
+                    ),
                     "pan_number": (
                         pan_number
                     ),

@@ -1,3 +1,4 @@
+import pdfplumber
 import os
 
 import pytesseract
@@ -25,20 +26,41 @@ class OCRUtils:
         # ==========================================
 
         if file_extension == ".pdf":
+            try:
 
-            pages = convert_from_path(
-                file_path
-            )
+                with pdfplumber.open(
+                    file_path
+                ) as pdf:
 
-            for page in pages:
+                    for page in pdf.pages:
 
-                text = pytesseract.image_to_string(
-                    page
+                        page_text = (
+                            page.extract_text()
+                        )
+
+                        if page_text:
+
+                            extracted_text += (
+                                page_text + "\n"
+                            )
+
+            except Exception:
+
+                pages = convert_from_path(
+                    file_path
                 )
 
-                extracted_text += (
-                    text + "\n"
-                )
+                for page in pages:
+
+                    text = (
+                        pytesseract.image_to_string(
+                            page
+                        )
+                    )
+
+                    extracted_text += (
+                        text + "\n"
+                    )
 
         # ==========================================
         # IMAGE SUPPORT
