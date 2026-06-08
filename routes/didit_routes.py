@@ -2,9 +2,9 @@ from flask import Blueprint, Config
 from flask import request
 from flask import jsonify
 from config import Config
-from services.didit_service import (
-    DiditService
-)
+#from services.didit_service import (
+    #DiditService
+#)
 
 didit_bp = Blueprint(
     "didit_bp",

@@ -1,3 +1,5 @@
+from multiprocessing.dummy import connection
+
 from db import get_connection
 
 
@@ -5,7 +7,6 @@ class PassportRepository:
 
     @staticmethod
     def save_passport_result(
-
         candidate_id,
         bgv_id,
         verification_status,
@@ -17,6 +18,7 @@ class PassportRepository:
         issue_date,
         expiry_date,
         provider_name,
+        api_reference_id,
         raw_response
     ):
 
@@ -38,12 +40,14 @@ class PassportRepository:
                 issue_date,
                 expiry_date,
                 provider_name,
+                api_reference_id,
                 raw_response
 
             )
 
             VALUES (
 
+                %s,
                 %s,
                 %s,
                 %s,
@@ -72,6 +76,7 @@ class PassportRepository:
             issue_date,
             expiry_date,
             provider_name,
+            api_reference_id,
             raw_response
         )
 
@@ -82,7 +87,9 @@ class PassportRepository:
         )
 
         connection.commit()
-
+        passport_result_id = cursor.lastrowid
+        connection.commit()
+        passport_result_id = cursor.lastrowid
         cursor.close()
-
         connection.close()
+        return passport_result_id

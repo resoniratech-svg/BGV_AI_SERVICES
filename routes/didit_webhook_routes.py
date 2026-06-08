@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, session
 from flask import request
 from flask import jsonify
 
@@ -42,7 +42,32 @@ def didit_webhook():
             "document",
             {}
         )
+        session = (
+            DiditRepository
+            .get_session_by_provider_session_id(
+                data.get("session_id")
+            )
+        )
 
+        if not session:
+
+            return jsonify({
+
+                "status": "failed",
+
+                "message": (
+                    "Session not found"
+                )
+
+            }), 404
+
+        candidate_id = session[
+            "candidate_id"
+        ]
+
+        bgv_id = session[
+            "bgv_request_id"
+        ]
         document_type = (
             document_data.get(
                 "document_type",
@@ -135,9 +160,9 @@ def didit_webhook():
 
             DrivingLicenseRepository.save_driving_license_result(
 
-                candidate_id=1,
+                candidate_id=candidate_id,
 
-                bgv_id=1,
+                bgv_id=bgv_id,
 
                 verification_status=data.get(
                     "status"
@@ -178,10 +203,10 @@ def didit_webhook():
 
             PassportRepository.save_passport_result(
 
-                candidate_id=1,
+                candidate_id=candidate_id,
 
-                bgv_id=1,
-
+                bgv_id=bgv_id,
+                
                 verification_status=data.get(
                     "status"
                 ),
@@ -216,9 +241,11 @@ def didit_webhook():
 
                 provider_name="Didit",
 
-                raw_response=json.dumps(
-                    data
-                )
+                api_reference_id=data.get(
+                    "session_id"
+                ),
+
+                raw_response=json.dumps(data)
             )
 
         return jsonify({

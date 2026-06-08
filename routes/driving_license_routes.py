@@ -14,9 +14,7 @@ driving_license_bp = Blueprint(
 
 
 @driving_license_bp.route(
-
     "/driving-license/verify",
-
     methods=["POST"]
 )
 def verify_driving_license():
@@ -33,9 +31,17 @@ def verify_driving_license():
             "bgv_id"
         )
 
-        document_id = data.get(
-            "document_id"
+        front_document_id = data.get(
+            "front_document_id"
         )
+
+        back_document_id = data.get(
+            "back_document_id"
+        )
+
+        # ======================================
+        # VALIDATIONS
+        # ======================================
 
         if not candidate_id:
 
@@ -59,14 +65,25 @@ def verify_driving_license():
                 )
             }), 400
 
-        if not document_id:
+        if not front_document_id:
 
             return jsonify({
 
                 "success": False,
 
                 "message": (
-                    "document_id is required"
+                    "front_document_id is required"
+                )
+            }), 400
+
+        if not back_document_id:
+
+            return jsonify({
+
+                "success": False,
+
+                "message": (
+                    "back_document_id is required"
                 )
             }), 400
 
@@ -75,21 +92,19 @@ def verify_driving_license():
             DrivingLicenseVerificationService
             .verify_driving_license(
 
-                candidate_id=(
-                    candidate_id
-                ),
+                candidate_id=candidate_id,
 
-                bgv_id=(
-                    bgv_id
-                ),
+                bgv_id=bgv_id,
 
-                document_id=(
-                    document_id
-                )
+                front_document_id=front_document_id,
+
+                back_document_id=back_document_id
             )
         )
 
-        return jsonify(result), 200
+        return jsonify(
+            result
+        ), 200
 
     except Exception as e:
 
