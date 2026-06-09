@@ -45,19 +45,27 @@ class PassportOCRService:
 
         passport_number = None
 
-        passport_match = re.search(
+        passport_patterns = [
 
             r"\b[A-Z][0-9]{7}\b",
 
-            extracted_text
-        )
+            r"\b[A-Z]{1}[0-9]{6,8}\b"
+        ]
 
-        if passport_match:
+        for pattern in passport_patterns:
+            passport_match = re.search(
 
-            passport_number = (
-                passport_match.group()
+                pattern,
+
+                extracted_text
             )
 
+            if passport_match:
+                passport_number = (
+                    passport_match.group()
+                )
+
+                break
         # ==========================================
         # FILE NUMBER
         # ==========================================

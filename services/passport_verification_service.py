@@ -6,6 +6,10 @@ from services.didit.passport_service import (
     DiditPassportService
 )
 
+from services.ongrid.passport_verification_service import (
+    OnGridPassportVerificationService
+)
+
 
 class PassportVerificationService:
 
@@ -18,17 +22,37 @@ class PassportVerificationService:
 
         provider = get_provider()
 
+        # ======================================
+        # DIDIT
+        # ======================================
+
         if provider == "didit":
 
             return (
                 DiditPassportService
                 .verify_passport(
+
                     candidate_id=candidate_id,
+
                     bgv_id=bgv_id,
+
                     document_id=document_id
                 )
             )
 
+        # ======================================
+        # ONGRID
+        # ======================================
+
+        if provider == "ongrid":
+
+            return (
+                OnGridPassportVerificationService
+                .verify_passport(
+                    document_id
+                )
+            )
+
         raise Exception(
-            "OnGrid passport verification not implemented yet"
+            "Invalid provider"
         )

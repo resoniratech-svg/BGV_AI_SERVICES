@@ -1,6 +1,7 @@
 import requests
 
 from config import Config
+from utils import response
 
 
 class OnGridClient:
@@ -29,7 +30,13 @@ class OnGridClient:
 
             timeout=60
         )
+        if not response.ok:
 
-        response.raise_for_status()
+            print("=" * 80)
+            print("GRIDLINES ERROR RESPONSE")
+            print("STATUS =", response.status_code)
+            print("BODY =", response.text)
+            print("=" * 80)
+            response.raise_for_status()
 
         return response.json()
