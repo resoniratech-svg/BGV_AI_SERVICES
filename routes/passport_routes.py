@@ -6,6 +6,10 @@ from services.passport_verification_service import (
     PassportVerificationService
 )
 
+from repositories.passport_repository import (
+    PassportRepository
+)
+
 passport_bp = Blueprint(
 
     "passport_bp",
@@ -98,6 +102,51 @@ def verify_passport():
         )
 
         return jsonify(result), 200
+
+    except Exception as e:
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(e)
+        }), 500
+@passport_bp.route(
+
+    "/passport/result/<int:candidate_id>",
+
+    methods=["GET"]
+)
+def get_passport_result(
+    candidate_id
+):
+
+    try:
+
+        result = (
+            PassportRepository
+            .get_passport_result(
+                candidate_id
+            )
+        )
+
+        if not result:
+
+            return jsonify({
+
+                "success": False,
+
+                "message": (
+                    "Passport result not found"
+                )
+            }), 404
+
+        return jsonify({
+
+            "success": True,
+
+            "data": result
+        }), 200
 
     except Exception as e:
 

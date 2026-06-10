@@ -37,7 +37,6 @@ class DrivingLicenseRepository:
                 api_reference_id,
                 provider_name,
                 raw_response
-
             )
 
             VALUES (
@@ -51,7 +50,7 @@ class DrivingLicenseRepository:
                 %s,
                 %s,
                 %s,
-                %s.
+                %s,
                 %s
             )
         """

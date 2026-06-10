@@ -19,7 +19,12 @@ class OnGridClient:
 
             "Accept": "application/json"
         }
-
+        print("=" * 80)
+        print("GRIDLINES REQUEST")
+        print("URL =", f"{Config.GRIDLINES_PRODUCTION_URL}{endpoint}")
+        print("HEADERS =", headers)
+        print("PAYLOAD =", payload)
+        print("=" * 80)
         response = requests.post(
 
             f"{Config.GRIDLINES_PRODUCTION_URL}{endpoint}",
@@ -37,6 +42,17 @@ class OnGridClient:
             print("STATUS =", response.status_code)
             print("BODY =", response.text)
             print("=" * 80)
-            response.raise_for_status()
+            return {
+
+                "success": False,
+
+                "verification_status": "FAILED",
+
+                "status": response.status_code,
+
+                "request_id": None,
+
+                "raw_response": response.text
+            }   
 
         return response.json()

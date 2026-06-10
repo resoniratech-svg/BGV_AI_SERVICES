@@ -81,15 +81,46 @@ class PassportRepository:
         )
 
         cursor.execute(
-
             query,
             values
         )
 
         connection.commit()
-        passport_result_id = cursor.lastrowid
-        connection.commit()
-        passport_result_id = cursor.lastrowid
+
+        passport_result_id = (
+            cursor.lastrowid
+        )
+
         cursor.close()
         connection.close()
+
         return passport_result_id
+
+    @staticmethod
+    def get_passport_result(
+        candidate_id
+    ):
+
+        connection = get_connection()
+
+        cursor = connection.cursor(
+            dictionary=True
+        )
+
+        cursor.execute(
+            """
+            SELECT *
+            FROM passport_results
+            WHERE candidate_id = %s
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (candidate_id,)
+        )
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return result

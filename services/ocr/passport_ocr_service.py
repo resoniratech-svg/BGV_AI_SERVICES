@@ -39,6 +39,17 @@ class PassportOCRService:
             )
         )
 
+        normalized_text = (
+            extracted_text
+            .replace("\r", "\n")
+        )
+
+        print("\n" + "=" * 80)
+        print("PASSPORT OCR DEBUG")
+        print("=" * 80)
+        print(normalized_text)
+        print("=" * 80)
+
         # ==========================================
         # PASSPORT NUMBER
         # ==========================================
@@ -53,37 +64,49 @@ class PassportOCRService:
         ]
 
         for pattern in passport_patterns:
-            passport_match = re.search(
 
+            match = re.search(
                 pattern,
-
-                extracted_text
+                normalized_text
             )
 
-            if passport_match:
+            if match:
+
                 passport_number = (
-                    passport_match.group()
+                    match.group()
+                    .strip()
                 )
 
                 break
+
         # ==========================================
         # FILE NUMBER
         # ==========================================
 
         file_number = None
 
-        file_match = re.search(
+        file_patterns = [
 
             r"\bV[A-Z0-9]{6,15}\b",
 
-            extracted_text
-        )
+            r"\b[A-Z]{1}[0-9]{10,15}\b"
+        ]
 
-        if file_match:
+        for pattern in file_patterns:
 
-            file_number = (
-                file_match.group()
+            match = re.search(
+                pattern,
+                normalized_text
             )
+
+            if match:
+
+                file_number = (
+                    match.group()
+                    .strip()
+                )
+
+                break
 
         # ==========================================
         # DATE OF BIRTH
@@ -91,18 +114,70 @@ class PassportOCRService:
 
         date_of_birth = None
 
-        dob_match = re.search(
+        # MRZ line 2 extraction
+        mrz_line_match = re.search(
 
-            r"\b\d{2}[/-]\d{2}[/-]\d{4}\b",
+            r"([A-Z]\d{7}<\d[A-Z0-9]{3}\d{6}\d[MF])",
 
-            extracted_text
+            normalized_text
         )
 
-        if dob_match:
+        if mrz_line_match:
+            print("=" * 80)
+            print("MRZ MATCH =", mrz_line_match)
+            print("=" * 80)
+
+            mrz_line = mrz_line_match.group(1)
+
+            dob_raw = mrz_line[13:19]
+
+            year = int(dob_raw[:2])
+
+            if year >= 50:
+
+                year += 1900
+
+            else:
+
+                year += 2000
+
+            month = dob_raw[2:4]
+
+            day = dob_raw[4:6]
 
             date_of_birth = (
-                dob_match.group()
+                f"{day}/{month}/{year}"
             )
+        # ==========================================
+        # SURNAME
+        # ==========================================
+
+        surname = None
+
+        surname_patterns = [
+
+            r"Surname\s*[:\-]?\s*([A-Z ]+)",
+
+            r"Surname\s*\n+\s*([A-Z ]+)"
+        ]
+
+        for pattern in surname_patterns:
+
+            match = re.search(
+                pattern,
+                normalized_text,
+                re.IGNORECASE
+            )
+
+            if match:
+
+                surname = (
+                    match.group(1)
+                    .replace("\n", " ")
+                    .strip()
+                )
+
+                break
 
         # ==========================================
         # GIVEN NAME
@@ -110,43 +185,71 @@ class PassportOCRService:
 
         given_name = None
 
-        given_name_match = re.search(
+        given_name_patterns = [
 
-            r"Given Name[s]?\s*[:\-]?\s*([A-Z\s]+)",
+            r"Given\s*Name(?:s)?\s*[:\-]?\s*([A-Z ]+)",
 
-            extracted_text,
+            r"Given\s*Name(?:s)?\s*\n+\s*([A-Z ]+)"
+        ]
 
-            re.IGNORECASE
-        )
+        for pattern in given_name_patterns:
 
-        if given_name_match:
-
-            given_name = (
-                given_name_match.group(1)
-                .strip()
+            match = re.search(
+                pattern,
+                normalized_text,
+                re.IGNORECASE
             )
 
+            if match:
+
+                given_name = (
+                    match.group(1)
+                    .replace("\n", " ")
+                    .strip()
+                )
+
+                break
+
         # ==========================================
-        # SURNAME
+        # MRZ FALLBACK
         # ==========================================
 
-        surname = None
+        if not surname or not given_name:
 
-        surname_match = re.search(
+            mrz_match = re.search(
 
-            r"Surname\s*[:\-]?\s*([A-Z\s]+)",
+                r"P<[A-Z]{3}([A-Z]+)<<([A-Z<]+)",
 
-            extracted_text,
-
-            re.IGNORECASE
-        )
-
-        if surname_match:
-
-            surname = (
-                surname_match.group(1)
-                .strip()
+                normalized_text
             )
+
+            if mrz_match:
+
+                if not surname:
+
+                    surname = (
+                        mrz_match.group(1)
+                        .replace("<", " ")
+                        .strip()
+                    )
+
+                if not given_name:
+
+                    given_name = (
+                        mrz_match.group(2)
+                        .replace("<", " ")
+                        .strip()
+                    )
+
+        print("\n" + "=" * 80)
+        print("PASSPORT OCR RESULT")
+        print("=" * 80)
+        print("PASSPORT NUMBER :", passport_number)
+        print("FILE NUMBER     :", file_number)
+        print("SURNAME         :", surname)
+        print("GIVEN NAME      :", given_name)
+        print("DATE OF BIRTH   :", date_of_birth)
+        print("=" * 80)
 
         return {
 
@@ -160,5 +263,5 @@ class PassportOCRService:
 
             "surname": surname,
 
-            "raw_text": extracted_text
+            "raw_text": normalized_text
         }

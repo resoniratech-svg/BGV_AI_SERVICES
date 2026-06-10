@@ -11,7 +11,9 @@ class OnGridPassportVerificationService:
 
     @staticmethod
     def verify_passport(
-        document_id
+        document_id,
+        candidate_id,
+        bgv_id
     ):
 
         passport_data = (
@@ -59,6 +61,10 @@ class OnGridPassportVerificationService:
         return (
             OnGridPassportService
             .verify_passport(
+
+                candidate_id=candidate_id,
+
+                bgv_id=bgv_id,
 
                 passport_number=passport_data[
                     "passport_number"

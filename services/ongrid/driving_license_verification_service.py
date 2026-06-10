@@ -11,6 +11,8 @@ class OnGridDrivingLicenseVerificationService:
 
     @staticmethod
     def verify_driving_license(
+        candidate_id,
+        bgv_id,
         document_id
     ):
 
@@ -44,6 +46,8 @@ class OnGridDrivingLicenseVerificationService:
         return (
             OnGridDrivingLicenseService
             .verify_driving_license(
+                candidate_id=candidate_id,
+                bgv_id=bgv_id,
                 dl_number=dl_data[
                     "driving_license_number"
                 ],

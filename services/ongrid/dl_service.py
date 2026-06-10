@@ -2,13 +2,17 @@ from services.ongrid.ongrid_client import (
     OnGridClient
 )
 
-
+from repositories.driving_license_repository import (
+    DrivingLicenseRepository
+)
 class OnGridDrivingLicenseService:
 
     @staticmethod
     def verify_driving_license(
         dl_number,
-        date_of_birth
+        date_of_birth,
+        candidate_id,
+        bgv_id
     ):
 
         payload = {
@@ -28,6 +32,36 @@ class OnGridDrivingLicenseService:
             "/dl-api/fetch",
 
             payload
+        )
+        DrivingLicenseRepository.save_driving_license_result(
+
+            candidate_id=candidate_id,
+
+            bgv_id=bgv_id,
+
+            verification_status=(
+                "APPROVED"
+                if response.get("data", {}).get("code") == "1000"
+                else "FAILED"
+            ),
+
+            license_number=dl_number,
+
+            full_name=None,
+
+            date_of_birth=date_of_birth,
+
+            issue_date=None,
+
+            expiry_date=None,
+
+            provider_name="ongrid",
+
+            api_reference_id=response.get(
+                "request_id"
+            ),
+
+            raw_response=str(response)
         )
         gridlines_success = (
             response.get(

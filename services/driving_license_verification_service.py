@@ -41,14 +41,16 @@ class DrivingLicenseVerificationService:
             )
 
         if provider == "ongrid":
-
             return (
                 OnGridDrivingLicenseVerificationService
                 .verify_driving_license(
-                    front_document_id
+
+                    candidate_id=candidate_id,
+
+                    bgv_id=bgv_id,
+
+                    document_id=front_document_id
                 )
             )
 
-        raise Exception(
-            "Invalid provider"
-        )
+        

@@ -49,7 +49,9 @@ class PassportVerificationService:
             return (
                 OnGridPassportVerificationService
                 .verify_passport(
-                    document_id
+                    document_id,
+                    candidate_id,
+                    bgv_id
                 )
             )
 
