@@ -5,7 +5,9 @@ from flask import jsonify
 from services.driving_license_verification_service import (
     DrivingLicenseVerificationService
 )
-
+from repositories.driving_license_repository import (
+    DrivingLicenseRepository
+)
 driving_license_bp = Blueprint(
 
     "driving_license_bp",
@@ -105,6 +107,47 @@ def verify_driving_license():
         return jsonify(
             result
         ), 200
+
+    except Exception as e:
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(e)
+        }), 500
+@driving_license_bp.route(
+        "/driving-license/result/<int:candidate_id>",
+        methods=["GET"]
+        )
+def get_driving_license_result(
+    candidate_id
+    ):
+    try:
+        result = (
+            DrivingLicenseRepository
+            .get_driving_license_result(
+                candidate_id
+            )
+        )
+
+        if not result:
+
+            return jsonify({
+
+                "success": False,
+
+                "message": (
+                    "Driving License result not found"
+                )
+            }), 404
+
+        return jsonify({
+
+            "success": True,
+
+            "data": result
+        }), 200
 
     except Exception as e:
 

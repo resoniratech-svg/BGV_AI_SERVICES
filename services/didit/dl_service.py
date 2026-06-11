@@ -139,9 +139,9 @@ class DiditDrivingLicenseService:
 
         ProviderUsageRepository.increment_usage(
 
-            provider_name="didit",
+            provider_name="DIDIT",
 
-            verification_type="passport_dl"
+            verification_type="DRIVING_LICENSE"
         )
 
         return {

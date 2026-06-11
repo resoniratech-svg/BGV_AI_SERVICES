@@ -1,9 +1,15 @@
+import json
+from urllib import response
+
 from services.ongrid.ongrid_client import (
     OnGridClient
 )
 
 from repositories.driving_license_repository import (
     DrivingLicenseRepository
+)
+from repositories.provider_usage_repository import (
+    ProviderUsageRepository
 )
 class OnGridDrivingLicenseService:
 
@@ -61,7 +67,7 @@ class OnGridDrivingLicenseService:
                 "request_id"
             ),
 
-            raw_response=str(response)
+            raw_response=json.dumps(response)
         )
         gridlines_success = (
             response.get(
@@ -71,6 +77,13 @@ class OnGridDrivingLicenseService:
                 "code"
             ) == "1000"
         )
+        ProviderUsageRepository.increment_usage(
+
+            provider_name="ONGRID",
+
+            verification_type="DRIVING_LICENSE"
+        )
+
         return {
             "success": gridlines_success,
             "provider": "ongrid",

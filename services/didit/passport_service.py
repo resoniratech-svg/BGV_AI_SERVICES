@@ -58,13 +58,16 @@ class DiditPassportService:
                 timeout=60
             )
 
-        if response.status_code != 200:
+        if not response.ok:
             raise Exception(
                 f"Didit Error: {response.text}"
             )
 
         response_data = response.json()
-
+        print("=" * 80)
+        print("DIDIT PASSPORT RESPONSE")
+        print(json.dumps(response_data, indent=4))
+        print("=" * 80)
         id_verification = (
             response_data.get(
                 "id_verification",
@@ -125,9 +128,9 @@ class DiditPassportService:
         )
         ProviderUsageRepository.increment_usage(
 
-            provider_name="didit",
+            provider_name="DIDIT",
 
-            verification_type="passport_dl"
+            verification_type="PASSPORT"
         )
         return {
 

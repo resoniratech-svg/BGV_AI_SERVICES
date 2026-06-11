@@ -1,4 +1,5 @@
 import uuid
+import json
 from datetime import datetime
 from services.ongrid.ongrid_client import (
     OnGridClient
@@ -6,7 +7,9 @@ from services.ongrid.ongrid_client import (
 from repositories.passport_repository import (
     PassportRepository
 )
-
+from repositories.provider_usage_repository import (
+    ProviderUsageRepository
+)
 class OnGridPassportService:
 
     @staticmethod
@@ -87,7 +90,7 @@ class OnGridPassportService:
                 "request_id"
             ),
 
-            raw_response=str(response)
+            raw_response=json.dumps(response)
         )
         return {
 
@@ -105,3 +108,9 @@ class OnGridPassportService:
 
             "response": response
         }
+    ProviderUsageRepository.increment_usage(
+
+    provider_name="ONGRID",
+
+    verification_type="PASSPORT"
+)
