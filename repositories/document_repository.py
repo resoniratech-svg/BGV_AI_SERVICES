@@ -40,4 +40,4 @@ class DocumentRepository:
 
         connection.close()
 
-        return result
+        return result 

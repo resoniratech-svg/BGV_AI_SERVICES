@@ -143,6 +143,13 @@ class Config:
     GRIDLINES_API_KEY = os.getenv(
         "GRIDLINES_API_KEY"
     )
+
+   
+    AADHAAR_TEMPLATE_ID = os.getenv(
+
+    "AADHAAR_TEMPLATE_ID"
+
+   )
 # ==========================================
 # TESSERACT
 # ==========================================
@@ -152,3 +159,5 @@ pytesseract.pytesseract.tesseract_cmd = (
 )
 
 print("AI JWT SECRET:", Config.JWT_SECRET_KEY)
+
+

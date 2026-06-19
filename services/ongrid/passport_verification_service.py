@@ -7,7 +7,7 @@ from services.ongrid.passport_service import (
 )
 
 
-class OnGridPassportVerificationService:
+class PassportVerificationService:
 
     @staticmethod
     def verify_passport(

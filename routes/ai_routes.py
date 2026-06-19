@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 from flask_jwt_extended import jwt_required
-from services.aadhaar_pan_service import process_aadhaar_verification, process_aadhaar_verification
-from services.aadhaar_pan_service import process_pan_verification
+# from services.aadhaar_pan_service import process_aadhaar_verification, process_aadhaar_verification
+# from services.aadhaar_pan_service import process_pan_verification
 from services.ocr_service import extract_text_from_image
 from services.docx_service import extract_docx_text
 from services.pdf_service import extract_pdf_text
@@ -10,11 +10,11 @@ from utils.auth import role_required
 import os
 from services.ocr_verification_service import verify_pan_fields
 from utils.document_parser import parse_aadhaar_details, parse_pan_details
-from services.aadhaar_pan_service import (
-    process_pan_verification,
-    process_aadhaar_verification,
-    process_face_match
-)
+# from services.aadhaar_pan_service import (
+#     process_pan_verification,
+#     process_aadhaar_verification,
+#     process_face_match
+# )
 from utils.document_parser import (
     parse_pan_details,
     parse_aadhaar_details
@@ -142,30 +142,30 @@ def ocr_api():
     process_pan_verification,
     process_aadhaar_verification
 )
-@ai_bp.route("/verify-pan", methods=["POST"])
-def verify_pan_api():
+# @ai_bp.route("/verify-pan", methods=["POST"])
+# def verify_pan_api():
 
-    data = request.get_json()
+#     data = request.get_json()
 
-    result = process_pan_verification(data)
+#     result = process_pan_verification(data)
 
-    return jsonify(result)
-@ai_bp.route("/verify-aadhaar", methods=["POST"])
-def verify_aadhaar_api():
+#     return jsonify(result)
+# @ai_bp.route("/verify-aadhaar", methods=["POST"])
+# def verify_aadhaar_api():
 
-    data = request.get_json()
+#     data = request.get_json()
 
-    result = process_aadhaar_verification(data)
+#     result = process_aadhaar_verification(data)
 
-    return jsonify(result)
-@ai_bp.route("/face-match", methods=["POST"])
-def face_match_api():
+#     return jsonify(result)
+# @ai_bp.route("/face-match", methods=["POST"])
+# def face_match_api():
 
-    data = request.get_json()
+#     data = request.get_json()
 
-    result = process_face_match(data)
+#     result = process_face_match(data)
 
-    return jsonify(result)
+#     return jsonify(result)
 
 @ai_bp.route("/ocr/verify", methods=["POST"])
 @jwt_required()

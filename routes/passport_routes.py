@@ -2,7 +2,7 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 
-from services.passport_verification_service import (
+from services.ongrid.passport_verification_service import (
     PassportVerificationService
 )
 

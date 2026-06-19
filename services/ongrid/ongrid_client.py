@@ -1,58 +1,200 @@
 import requests
 
 from config import Config
-from utils import response
 
 
 class OnGridClient:
 
     @staticmethod
-    def post(endpoint, payload):
+    def post(
+
+        endpoint,
+        payload
+
+    ):
 
         headers = {
 
-            "X-API-Key": Config.GRIDLINES_API_KEY,
+            "X-API-Key":
+            Config.GRIDLINES_API_KEY,
 
-            "X-Auth-Type": "API-Key",
+            "X-Auth-Type":
+            "API-Key",
 
-            "Content-Type": "application/json",
+            "Content-Type":
+            "application/json",
 
-            "Accept": "application/json"
+            "Accept":
+            "application/json"
+
         }
-        print("=" * 80)
-        print("GRIDLINES REQUEST")
-        print("URL =", f"{Config.GRIDLINES_PRODUCTION_URL}{endpoint}")
-        print("HEADERS =", headers)
-        print("PAYLOAD =", payload)
-        print("=" * 80)
-        response = requests.post(
 
-            f"{Config.GRIDLINES_PRODUCTION_URL}{endpoint}",
+        try:
 
-            headers=headers,
+            response = requests.post(
 
-            json=payload,
+                f"{Config.GRIDLINES_PRODUCTION_URL}{endpoint}",
 
-            timeout=60
-        )
-        if not response.ok:
+                headers=headers,
 
-            print("=" * 80)
-            print("GRIDLINES ERROR RESPONSE")
-            print("STATUS =", response.status_code)
-            print("BODY =", response.text)
-            print("=" * 80)
+                json=payload,
+
+                timeout=60
+
+            )
+
+        except Exception as e:
+
             return {
 
                 "success": False,
 
-                "verification_status": "FAILED",
-
-                "status": response.status_code,
+                "status": 500,
 
                 "request_id": None,
 
-                "raw_response": response.text
-            }   
+                "raw_response": str(e)
+
+            }
+
+        if not response.ok:
+
+            print("=" * 80)
+            print("GRIDLINES ERROR RESPONSE")
+
+            print(
+
+                "STATUS =",
+
+                response.status_code
+
+            )
+
+            print(
+
+                "BODY =",
+
+                response.text
+
+            )
+
+            print("=" * 80)
+
+            return {
+
+                "success": False,
+
+                "verification_status":
+                "FAILED",
+
+                "status":
+                response.status_code,
+
+                "request_id":
+                None,
+
+                "raw_response":
+                response.text
+
+            }
+
+        return response.json()
+
+    @staticmethod
+    def get(
+
+        endpoint,
+
+        headers=None
+
+    ):
+
+        request_headers = {
+
+            "X-API-Key":
+            Config.GRIDLINES_API_KEY,
+
+            "X-Auth-Type":
+            "API-Key",
+
+            "Content-Type":
+            "application/json",
+
+            "Accept":
+            "application/json"
+
+        }
+
+        if headers:
+
+            request_headers.update(
+
+                headers
+
+            )
+
+        try:
+
+            response = requests.get(
+
+                f"{Config.GRIDLINES_PRODUCTION_URL}{endpoint}",
+
+                headers=request_headers,
+
+                timeout=60
+
+            )
+
+        except Exception as e:
+
+            return {
+
+                "success": False,
+
+                "status": 500,
+
+                "request_id": None,
+
+                "raw_response": str(e)
+
+            }
+
+        if not response.ok:
+
+            print("=" * 80)
+            print("GRIDLINES ERROR RESPONSE")
+
+            print(
+
+                "STATUS =",
+
+                response.status_code
+
+            )
+
+            print(
+
+                "BODY =",
+
+                response.text
+
+            )
+
+            print("=" * 80)
+
+            return {
+
+                "success": False,
+
+                "status":
+                response.status_code,
+
+                "request_id":
+                None,
+
+                "raw_response":
+                response.text
+
+            }
 
         return response.json()
