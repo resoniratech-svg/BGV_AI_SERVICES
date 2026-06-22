@@ -59,6 +59,16 @@ class AadhaarVerificationService:
 
         )
 
+        gender = (
+
+            ocr_data.get(
+
+                 "gender"
+
+    )
+
+)
+
         if not full_name:
 
             raise Exception(
@@ -72,6 +82,14 @@ class AadhaarVerificationService:
             raise Exception(
 
                 "Date of birth not extracted from Aadhaar"
+
+            )
+        
+        if not gender:
+
+            raise Exception(
+
+                "Gender not extracted from Aadhaar"
 
             )
 
@@ -98,6 +116,10 @@ class AadhaarVerificationService:
 
                 date_of_birth=
                 date_of_birth,
+
+
+                gender=
+                gender,
 
                 provider_name=
                 "GRIDLINES",
@@ -196,6 +218,20 @@ class AadhaarVerificationService:
             )
 
         )
+         
+        resident_image = (
+
+            ovse_data.get(
+
+                "resident_image"
+
+            )
+
+            or
+
+            ""
+
+) 
 
         resident_name = (
 
@@ -324,6 +360,9 @@ class AadhaarVerificationService:
 
             date_of_birth=
             uidai_dob,
+           
+            resident_image=
+            resident_image,
 
             name_match_status=
             name_match_status,

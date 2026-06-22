@@ -242,6 +242,7 @@ class AadhaarRepository:
         document_id,
         full_name,
         date_of_birth,
+        gender,
         provider_name,
         api_reference_id,
         raw_response
@@ -261,6 +262,7 @@ class AadhaarRepository:
                 document_id,
                 full_name,
                 date_of_birth,
+                gender,
                 provider_name,
                 api_reference_id,
                 raw_response
@@ -269,6 +271,7 @@ class AadhaarRepository:
 
             VALUES (
 
+                %s,
                 %s,
                 %s,
                 %s,
@@ -289,6 +292,7 @@ class AadhaarRepository:
             document_id,
             full_name,
             date_of_birth,
+            gender,
             provider_name,
             api_reference_id,
             raw_response
@@ -327,6 +331,7 @@ class AadhaarRepository:
         date_of_birth,
         name_match_status,
         dob_match_status,
+        resident_image,
         provider_name,
         api_reference_id,
         raw_response
@@ -349,6 +354,7 @@ class AadhaarRepository:
                 date_of_birth,
                 name_match_status,
                 dob_match_status,
+                resident_image,
                 provider_name,
                 api_reference_id,
                 raw_response
@@ -357,6 +363,7 @@ class AadhaarRepository:
 
             VALUES (
 
+                %s,
                 %s,
                 %s,
                 %s,
@@ -383,6 +390,7 @@ class AadhaarRepository:
             date_of_birth,
             name_match_status,
             dob_match_status,
+            resident_image,
             provider_name,
             api_reference_id,
             raw_response

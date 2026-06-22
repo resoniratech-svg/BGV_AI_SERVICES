@@ -97,7 +97,7 @@ class AadhaarOCRService:
             OnGridClient
             .post(
 
-                "/ocr",
+                "/aadhaar-api/ocr",
 
                 payload
 
@@ -114,6 +114,8 @@ class AadhaarOCRService:
             raise Exception(
                 "Empty Aadhaar OCR response"
             )
+        
+        
 
         if response.get(
             "status"

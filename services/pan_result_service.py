@@ -1,5 +1,3 @@
-import json
-
 from repositories.pan_repository import (
     PanRepository
 )
@@ -9,16 +7,17 @@ class PANResultService:
 
 
     @staticmethod
-    def get_pan_result(
+    def get_result(
 
         candidate_id
 
     ):
 
 
-        result = (
+        verification_result = (
 
             PanRepository
+
             .get_pan_verification_result(
 
                 candidate_id
@@ -28,102 +27,95 @@ class PANResultService:
         )
 
 
-        if not result:
-
-            raise Exception(
-
-                "PAN verification result not found"
-
-            )
+        if not verification_result:
 
 
-        raw_response = {}
-
-        if result.get(
-
-            "raw_response"
-
-        ):
-
-            raw_response = json.loads(
-
-                result[
-
-                    "raw_response"
-
-                ]
-
-            )
+            return {
 
 
-        provider_error = None
+                "success": False,
 
 
-        display_message = None
+                "verification_status":
+
+                "NOT_VERIFIED",
 
 
-        if raw_response.get(
+                "display_message":
 
-            "error"
+                "Admin has not verified PAN yet"
 
-        ):
-
-
-            provider_error = (
-
-                raw_response[
-
-                    "error"
-
-                ].get(
-
-                    "message"
-
-                )
-
-            )
+            }
 
 
-            display_message = (
+        verification_status = (
 
-                "GRIDLINES PAN Verification "
-
-                "is not enabled for this API key"
-
-            )
-
-
-        elif (
-
-            result[
+            verification_result.get(
 
                 "verification_status"
 
-            ]
+            )
 
-            ==
-
-            "APPROVED"
-
-        ):
+        )
 
 
-            display_message = (
+        pan_match_status = (
 
-                "PAN verification completed "
+            verification_result.get(
 
-                "successfully"
+                "pan_match_status"
 
             )
 
+        )
 
-        elif (
 
-            result[
+        name_match_status = (
+
+            verification_result.get(
 
                 "name_match_status"
 
-            ]
+            )
+
+        )
+
+
+        dob_match_status = (
+
+            verification_result.get(
+
+                "dob_match_status"
+
+            )
+
+        )
+
+
+        if verification_status == "VERIFIED":
+
+
+            return {
+
+
+                "success": True,
+
+
+                "verification_status":
+
+                "VERIFIED",
+
+
+                "display_message":
+
+                "PAN verification completed successfully"
+
+            }
+
+
+        if (
+
+            pan_match_status
 
             ==
 
@@ -132,11 +124,16 @@ class PANResultService:
             and
 
 
-            result[
+            name_match_status
 
-                "dob_match_status"
+            ==
 
-            ]
+            "MATCH"
+
+            and
+
+
+            dob_match_status
 
             ==
 
@@ -145,22 +142,27 @@ class PANResultService:
         ):
 
 
-            display_message = (
-
-                "PAN holder name "
-
-                "does not match"
-
-            )
+            return {
 
 
-        elif (
+                "success": False,
 
-            result[
 
-                "name_match_status"
+                "verification_status":
 
-            ]
+                "FAILED",
+
+
+                "display_message":
+
+                "PAN number does not match"
+
+            }
+
+
+        if (
+
+            pan_match_status
 
             ==
 
@@ -169,35 +171,7 @@ class PANResultService:
             and
 
 
-            result[
-
-                "dob_match_status"
-
-            ]
-
-            ==
-
-            "NOT_MATCH"
-
-        ):
-
-
-            display_message = (
-
-                "PAN holder date of birth "
-
-                "does not match"
-
-            )
-
-
-        elif (
-
-            result[
-
-                "name_match_status"
-
-            ]
+            name_match_status
 
             ==
 
@@ -206,11 +180,54 @@ class PANResultService:
             and
 
 
-            result[
+            dob_match_status
 
-                "dob_match_status"
+            ==
 
-            ]
+            "MATCH"
+
+        ):
+
+
+            return {
+
+
+                "success": False,
+
+
+                "verification_status":
+
+                "FAILED",
+
+
+                "display_message":
+
+                "PAN holder name does not match"
+
+            }
+
+
+        if (
+
+            pan_match_status
+
+            ==
+
+            "MATCH"
+
+            and
+
+
+            name_match_status
+
+            ==
+
+            "MATCH"
+
+            and
+
+
+            dob_match_status
 
             ==
 
@@ -219,71 +236,37 @@ class PANResultService:
         ):
 
 
-            display_message = (
-
-                "PAN holder name and "
-
-                "date of birth do not match"
-
-            )
+            return {
 
 
-        else:
+                "success": False,
 
 
-            display_message = (
+                "verification_status":
 
-                "PAN verification failed"
+                "FAILED",
 
-            )
+
+                "display_message":
+
+                "PAN holder DOB does not match"
+
+            }
 
 
         return {
 
 
+            "success": False,
+
+
             "verification_status":
 
-            result[
-
-                "verification_status"
-
-            ],
-
-
-            "provider_name":
-
-            result[
-
-                "provider_name"
-
-            ],
-
-
-            "name_match_status":
-
-            result[
-
-                "name_match_status"
-
-            ],
-
-
-            "dob_match_status":
-
-            result[
-
-                "dob_match_status"
-
-            ],
-
-
-            "provider_error":
-
-            provider_error,
+            "FAILED",
 
 
             "display_message":
 
-            display_message
+            "PAN verification failed"
 
         }

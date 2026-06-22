@@ -97,6 +97,7 @@ class PanRepository:
         pan_number,
         full_name,
         date_of_birth,
+        pan_match_status,
         name_match_status,
         dob_match_status,
         provider_name,
@@ -119,6 +120,7 @@ class PanRepository:
                 pan_number,
                 full_name,
                 date_of_birth,
+                pan_match_status,
                 name_match_status,
                 dob_match_status,
                 provider_name,
@@ -129,6 +131,7 @@ class PanRepository:
 
             VALUES (
 
+                %s,
                 %s,
                 %s,
                 %s,
@@ -155,6 +158,7 @@ class PanRepository:
             pan_number,
             full_name,
             date_of_birth,
+            pan_match_status,
             name_match_status,
             dob_match_status,
             provider_name,
