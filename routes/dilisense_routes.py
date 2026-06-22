@@ -33,9 +33,8 @@ def screen_watchlist():
             "full_name"
         )
 
-        country = data.get(
-            "country"
-        )
+        dob = data.get("dob")
+        gender = data.get("gender")
 
         if not candidate_id:
 
@@ -55,13 +54,19 @@ def screen_watchlist():
                 "message": "full_name required"
             }), 400
 
-        result = AMLService.screen_candidate(
+        # Fixed: Updated call to match AMLService.screen_watchlist
+        from datetime import datetime
 
+        if dob and "-" in dob:
+            dob = datetime.strptime(
+                dob,
+                "%Y-%m-%d"
+            ).strftime("%d/%m/%Y")
+        result = AMLService.screen_watchlist(
             candidate_id=candidate_id,
-
             full_name=full_name,
-
-            country=country
+            dob=dob,
+            gender=gender
         )
 
         return jsonify(result)

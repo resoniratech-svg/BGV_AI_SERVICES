@@ -1,6 +1,6 @@
 import pdfplumber
 import os
-
+import pdfplumber
 import pytesseract
 
 from PIL import Image
