@@ -30,6 +30,18 @@ def parse_resume():
 
     try:
 
+        print("\n====================")
+        print("FILES")
+        print(request.files)
+
+        print("\nFORM")
+        print(request.form)
+
+        print("\nCONTENT TYPE")
+        print(request.content_type)
+
+        print("====================\n")
+
         # ==========================================
         # VALIDATE FILE
         # ==========================================

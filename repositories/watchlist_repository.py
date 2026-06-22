@@ -70,7 +70,8 @@ class WatchlistRepository:
             provider_name,
             raw_response
         )
-
+        print("AML SCREENING INSERT")
+        print(values)
         cursor.execute(
             query,
             values
@@ -99,7 +100,7 @@ class WatchlistRepository:
     ):
 
         connection = get_connection()
-
+       
         cursor = connection.cursor()
 
         query = """
@@ -149,7 +150,8 @@ class WatchlistRepository:
             provider_name,
             raw_response
         )
-
+        print("GLOBAL WATCHLIST INSERT")
+        print(values)
         cursor.execute(
             query,
             values

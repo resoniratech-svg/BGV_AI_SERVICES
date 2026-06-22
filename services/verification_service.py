@@ -28,138 +28,34 @@ class VerificationService:
 
         return verification_id
 
+    
     @staticmethod
-    def mark_verification_completed(
-        verification_id
-    ):
+    def get_bgv_request_id(candidate_id):
 
         connection = get_connection()
-
-        cursor = connection.cursor()
+        cursor = connection.cursor(dictionary=True)
 
         query = """
-
-            UPDATE verification_results
-
-            SET
-
-                status = %s,
-                completed_at = NOW()
-
-            WHERE id = %s
+            SELECT id
+            FROM bgv_requests
+            WHERE candidate_id = %s
+            ORDER BY id DESC
+            LIMIT 1
         """
 
-        values = (
-
-            "COMPLETED",
-            verification_id
-        )
-
-        cursor.execute(
-            query,
-            values
-        )
-
-        connection.commit()
+        cursor.execute(query, (candidate_id,))
+        result = cursor.fetchone()
 
         cursor.close()
-
         connection.close()
 
-    @staticmethod
-    def mark_verification_failed(
-
-        verification_id,
-        remarks=None
-    ):
-
-        connection = get_connection()
-
-        cursor = connection.cursor()
-
-        query = """
-
-            UPDATE verification_results
-
-            SET
-
-                status = %s,
-                remarks = %s,
-                completed_at = NOW()
-
-            WHERE id = %s
-        """
-
-        values = (
-
-            "FAILED",
-            remarks,
-            verification_id
-        )
-
-        cursor.execute(
-            query,
-            values
-        )
-
-        connection.commit()
-
-        cursor.close()
-
-        connection.close()
-
-    @staticmethod
-    def initiate_watchlist_verification(
-
-        candidate_id
-    ):
-
-        connection = get_connection()
-
-        cursor = connection.cursor()
-
-        query = """
-            INSERT INTO verification_results (
-
-                bgv_id,
-                verification_type_id,
-                status,
-                started_at
-
+        if not result:
+            raise Exception(
+                f"No BGV request found for candidate {candidate_id}"
             )
 
-            VALUES (
-
-                %s,
-                %s,
-                %s,
-                NOW()
-            )
-        """
-
-        values = (
-
-            candidate_id,
-            1,
-            "INITIATED"
-        )
-
-        cursor.execute(
-
-            query,
-            values
-        )
-
-        connection.commit()
-
-        verification_id = cursor.lastrowid
-
-        cursor.close()
-
-        connection.close()
-
-        return verification_id
-
+        return result["id"]
+    
     @staticmethod
     def update_verification_result(
 

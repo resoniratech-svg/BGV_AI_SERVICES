@@ -7,20 +7,18 @@ from repositories.watchlist_repository import (
     WatchlistRepository
 )
 
-from services.verification_service import (
-    VerificationService
-)
+
 
 
 class AMLService:
 
     @staticmethod
-    def screen_candidate(
-
-        candidate_id,
-        full_name,
-        country
-    ):
+    def screen_watchlist(
+    candidate_id,
+    full_name,
+    dob=None,
+    gender=None
+):
 
         verification_id = None
 
@@ -29,13 +27,7 @@ class AMLService:
             # ==========================================
             # CREATE VERIFICATION SESSION
             # ==========================================
-
-            verification_id = (
-                VerificationService
-                .initiate_watchlist_verification(
-                    candidate_id
-                )
-            )
+            verification_id = None
 
             # ==========================================
             # API URL
@@ -68,14 +60,19 @@ class AMLService:
                 "fuzzy_search": 1
             }
 
-            if country:
+            if dob:
 
-                params["country"] = country
+                params["dob"] = dob
+
+            if gender:
+
+                params["gender"] = gender
 
             # ==========================================
             # API CALL
             # ==========================================
-
+            print("DILISENSE PARAMS")
+            print(params)
             response = requests.get(
 
                 url,
@@ -87,11 +84,19 @@ class AMLService:
                 timeout=Config.DILISENSE_TIMEOUT
             )
 
+            print("STATUS CODE:")
+            print(response.status_code)
+
+            print("RAW RESPONSE:")
+            print(response.text)
+
             response.raise_for_status()
 
-            response_data = (
-                response.json()
-            )
+            response_data = response.json()
+                        
+            # --- DEBUGGING FOR ISSUE 2 ---
+            print("DILISENSE RESPONSE:")
+            print(json.dumps(response_data, indent=2))
 
             # ==========================================
             # AML RESULT EXTRACTION
@@ -152,9 +157,7 @@ class AMLService:
                 verification_id=verification_id,
 
                 full_name=full_name,
-
-                country=country,
-
+                country=None,
                 aml_status=aml_status,
 
                 risk_level=risk_level,
@@ -183,9 +186,7 @@ class AMLService:
                 verification_id=verification_id,
 
                 full_name=full_name,
-
-                country=country,
-
+                country=None,
                 aml_status=aml_status,
 
                 risk_level=risk_level,
@@ -207,10 +208,7 @@ class AMLService:
             # MARK COMPLETED
             # ==========================================
 
-            VerificationService.mark_verification_completed(
-
-                verification_id
-            )
+            
 
             # ==========================================
             # FINAL RESPONSE
@@ -249,11 +247,7 @@ class AMLService:
 
             print("AML ERROR:", str(e))
 
-            if verification_id:
 
-                VerificationService.mark_verification_failed(
-                    verification_id
-                )
 
             return {
 
@@ -300,7 +294,8 @@ class AMLService:
         if gender:
 
             params["gender"] = gender
-
+        print("DILISENSE PARAMS")
+        print(params)
         response = requests.get(
 
             url,
@@ -322,8 +317,8 @@ class AMLService:
         candidate_id,
         verification_id,
         full_name,
-        country,
-        response_data
+        response_data,
+        country=None
     ):
 
         WatchlistRepository.save_aml_screening_result(
@@ -333,9 +328,7 @@ class AMLService:
             verification_id=verification_id,
 
             full_name=full_name,
-
             country=country,
-
             aml_status="CLEAR",
 
             risk_level="LOW",
@@ -360,9 +353,7 @@ class AMLService:
             verification_id=verification_id,
 
             full_name=full_name,
-
             country=country,
-
             aml_status="CLEAR",
 
             risk_level="LOW",
@@ -380,7 +371,4 @@ class AMLService:
             )
         )
 
-        VerificationService.mark_verification_completed(
-
-            verification_id
-        )
+        

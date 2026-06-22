@@ -236,3 +236,102 @@ class ReportRepository:
         connection.close()
 
         return reports
+    
+    @staticmethod
+    def get_latest_report(candidate_id):
+
+        connection = get_connection()
+
+        cursor = connection.cursor(
+            dictionary=True
+        )
+
+        query = """
+        SELECT *
+        FROM bgv_reports
+        WHERE candidate_id = %s
+        ORDER BY id DESC
+        LIMIT 1
+        """
+
+        cursor.execute(
+            query,
+            (candidate_id,)
+        )
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return result
+    
+    #==========================================
+    # FETCH DATABASE DATA
+    # ==========================================
+    @staticmethod
+    def get_candidate_details(candidate_id):
+
+        connection = get_connection()
+
+        cursor = connection.cursor(
+            dictionary=True
+        )
+
+        query = """
+        SELECT
+
+            CONCAT(
+                first_name,
+                ' ',
+                COALESCE(last_name, '')
+            ) AS full_name
+
+        FROM candidates
+
+        WHERE id = %s
+        """
+
+        cursor.execute(
+            query,
+            (candidate_id,)
+        )
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return result
+    @staticmethod
+    def get_candidate_summary(candidate_id):
+
+        connection = get_connection()
+
+        cursor = connection.cursor(
+            dictionary=True
+        )
+
+        query = """
+
+        SELECT *
+
+        FROM candidate_verification_summary
+
+        WHERE candidate_id = %s
+
+        LIMIT 1
+
+        """
+
+        cursor.execute(
+            query,
+            (candidate_id,)
+        )
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return result
