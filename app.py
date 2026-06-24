@@ -12,40 +12,18 @@ from routes.health_routes import health_bp
 from utils.auth import generate_token
 from routes.didit_routes import didit_bp
 from routes.didit_webhook_routes import didit_webhook_bp
-from routes.rchilli_routes import (
-    rchilli_bp
-)
-from routes.dilisense_routes import (
-    dilisense_bp
-)
-from routes.indiankanoon_routes import (
-    indiankanoon_bp
-)
-from routes.court_record_routes import (
-    court_record_bp
-)
-from routes.salary_slip_routes import (
-    salary_slip_bp
-)
-from routes.report_routes import (
-    report_bp
-)
+from routes.rchilli_routes import rchilli_bp
+from routes.dilisense_routes import dilisense_bp
+from routes.indiankanoon_routes import indiankanoon_bp
+from routes.court_record_routes import court_record_bp
+from routes.salary_slip_routes import salary_slip_bp
+from routes.report_routes import report_bp
 
-from routes.passport_routes import (
-    passport_bp
-)
-from routes.document_routes import (
-    document_bp
-)
-from routes.driving_license_routes import (
-    driving_license_bp
-)
-from routes.aadhaar_routes import (
-    aadhaar_bp
-)
-from routes.pan_routes import (
-    pan_bp
-)
+from routes.passport_routes import passport_bp
+from routes.document_routes import document_bp
+from routes.driving_license_routes import driving_license_bp
+from routes.aadhaar_routes import aadhaar_bp
+from routes.pan_routes import pan_bp
 
 
 app = Flask(__name__)
@@ -60,85 +38,28 @@ CORS(app)
 # Upload Folder Configuration
 app.config["UPLOAD_FOLDER"] = Config.UPLOAD_FOLDER
 
-os.makedirs(
-    Config.UPLOAD_FOLDER,
-    exist_ok=True
-)
+os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
 
 # Register Blueprint
-app.register_blueprint(
-    ai_bp,
-    url_prefix="/api/v1"
-)
+app.register_blueprint(ai_bp, url_prefix="/api/v1")
 
-app.register_blueprint(
-    health_bp,
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-    didit_bp,
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-    didit_webhook_bp,
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-    rchilli_bp,
-    url_prefix="/api/v1"
-)
+app.register_blueprint(health_bp, url_prefix="/api/v1")
+app.register_blueprint(didit_bp, url_prefix="/api/v1")
+app.register_blueprint(didit_webhook_bp, url_prefix="/api/v1")
+app.register_blueprint(rchilli_bp, url_prefix="/api/v1")
 
-app.register_blueprint(
+app.register_blueprint(dilisense_bp, url_prefix="/api/v1")
+app.register_blueprint(indiankanoon_bp, url_prefix="/api/v1")
+app.register_blueprint(court_record_bp, url_prefix="/api/v1")
+app.register_blueprint(salary_slip_bp, url_prefix="/api/v1")
+app.register_blueprint(report_bp, url_prefix="/api/v1")
+app.register_blueprint(passport_bp, url_prefix="/api/v1")
 
-    dilisense_bp,
+app.register_blueprint(driving_license_bp, url_prefix="/api/v1")
+app.register_blueprint(document_bp, url_prefix="/api/v1")
+app.register_blueprint(aadhaar_bp, url_prefix="/api/v1")
+app.register_blueprint(pan_bp, url_prefix="/api/v1")
 
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-
-    indiankanoon_bp,
-
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-
-    court_record_bp,
-
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-
-    salary_slip_bp,
-
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-
-    report_bp,
-
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-    passport_bp,
-    url_prefix="/api/v1"
-)
-
-app.register_blueprint(
-    driving_license_bp,
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-    document_bp,
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-    aadhaar_bp,
-    url_prefix="/api/v1"
-)
-app.register_blueprint(
-    pan_bp,
-    url_prefix="/api/v1"
-)
 
 # LOGIN API
 @app.route("/login", methods=["POST"])
@@ -152,56 +73,27 @@ def login():
 
     # ROLE CHECKS
     if username == "admin" and password == "admin123":
-
         role = "SUPER_ADMIN"
 
     elif username == "hr" and password == "hr123":
-
         role = "HR"
 
     elif username == "reviewer" and password == "review123":
-
         role = "REVIEWER"
 
     else:
-
-        return jsonify({
-
-            "success": False,
-
-            "message": "Invalid credentials"
-
-        }), 401
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
     # GENERATE TOKEN
-    token = generate_token(
-        username,
-        role
-    )
+    token = generate_token(username, role)
 
-    return jsonify({
-
-        "success": True,
-
-        "role": role,
-
-        "access_token": token
-
-    })
+    return jsonify({"success": True, "role": role, "access_token": token})
 
 
 # MAIN
 if __name__ == "__main__":
-
     print("STARTING PRODUCTION BGV AI SERVICE...")
 
-    app.run(
+    app.run(host=Config.HOST, port=Config.PORT, debug=True)
 
-        host=Config.HOST,
-
-        port=Config.PORT,
-
-        debug=True
-    )
-
-    
+    #  source /Users/resoniratechnologies/Documents/BGV_AI_SERVICES/.venv/bin/activate
