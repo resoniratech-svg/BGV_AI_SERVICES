@@ -47,6 +47,15 @@ from routes.pan_routes import (
     pan_bp
 )
 
+from routes.deepfake_routes import (
+    deepfake_bp
+)
+
+from routes.face_match_routes import (
+
+    face_match_bp
+
+)
 
 app = Flask(__name__)
 # JWT Configuration
@@ -138,6 +147,21 @@ app.register_blueprint(
 app.register_blueprint(
     pan_bp,
     url_prefix="/api/v1"
+)
+app.register_blueprint(
+
+    deepfake_bp,
+
+    url_prefix="/api/v1"
+
+)
+
+app.register_blueprint(
+
+    face_match_bp,
+
+    url_prefix="/api/v1"
+
 )
 
 # LOGIN API

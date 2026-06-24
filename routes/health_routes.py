@@ -10,6 +10,7 @@ health_bp = Blueprint(
 @health_bp.route(
     "/health",
     methods=["GET"]
+    
 )
 def health_check():
 
