@@ -6,7 +6,6 @@ from flask_jwt_extended import JWTManager
 import os
 
 from config import Config
-from db import mysql
 from routes.ai_routes import ai_bp
 from routes.health_routes import health_bp
 from utils.auth import generate_token
