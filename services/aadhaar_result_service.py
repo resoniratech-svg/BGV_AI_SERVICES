@@ -38,6 +38,10 @@ class AadhaarResultService:
         )
 
 
+        # =====================================
+        # CONSENT SESSION NOT FOUND
+        # =====================================
+
         if not session:
 
             raise Exception(
@@ -59,22 +63,16 @@ class AadhaarResultService:
 
 
         # =====================================
-        # CONSENT NOT COMPLETED
+        # CONSENT PENDING
         # =====================================
 
         if session_status == "PENDING":
 
-
             return {
-
 
                 "success": False,
 
-
-                "verification_status":
-
-                "PENDING",
-
+                "verification_status": "PENDING",
 
                 "display_message":
 
@@ -84,22 +82,16 @@ class AadhaarResultService:
 
 
         # =====================================
-        # CONSENT DENIED
+        # CONSENT REJECTED
         # =====================================
 
         if session_status == "REJECTED":
 
-
             return {
-
 
                 "success": False,
 
-
-                "verification_status":
-
-                "REJECTED",
-
+                "verification_status": "REJECTED",
 
                 "display_message":
 
@@ -114,17 +106,11 @@ class AadhaarResultService:
 
         if not verification_result:
 
-
             return {
-
 
                 "success": False,
 
-
-                "verification_status":
-
-                "NOT_VERIFIED",
-
+                "verification_status": "NOT_VERIFIED",
 
                 "display_message":
 
@@ -166,23 +152,28 @@ class AadhaarResultService:
         )
 
 
+        gender_match_status = (
+
+            verification_result.get(
+
+                "gender_match_status"
+
+            )
+
+        )
+
+
         # =====================================
         # VERIFIED
         # =====================================
 
         if verification_status == "VERIFIED":
 
-
             return {
-
 
                 "success": True,
 
-
-                "verification_status":
-
-                "VERIFIED",
-
+                "verification_status": "VERIFIED",
 
                 "display_message":
 
@@ -192,144 +183,95 @@ class AadhaarResultService:
 
 
         # =====================================
-        # NAME MISMATCH
+        # FIND ALL MISMATCHES
         # =====================================
 
-        if (
-
-            name_match_status
-
-            ==
-
-            "NOT_MATCH"
-
-            and
+        mismatches = []
 
 
-            dob_match_status
+        if name_match_status == "NOT_MATCH":
 
-            ==
+            mismatches.append(
 
-            "MATCH"
+                "name"
 
-        ):
-
-
-            return {
+            )
 
 
-                "success": False,
+        if dob_match_status == "NOT_MATCH":
+
+            mismatches.append(
+
+                "date of birth"
+
+            )
 
 
-                "verification_status":
+        if gender_match_status == "NOT_MATCH":
 
-                "FAILED",
+            mismatches.append(
 
+                "gender"
 
-                "display_message":
-
-                "Aadhaar holder name does not match"
-
-            }
+            )
 
 
         # =====================================
-        # DOB MISMATCH
+        # BUILD MESSAGE
         # =====================================
 
-        if (
+        if len(mismatches) == 1:
 
-            name_match_status
+            message = (
 
-            ==
+                f"Aadhaar holder {mismatches[0]} does not match"
 
-            "MATCH"
-
-            and
+            )
 
 
-            dob_match_status
+        elif len(mismatches) == 2:
 
-            ==
+            message = (
 
-            "NOT_MATCH"
+                f"Aadhaar holder "
 
-        ):
+                f"{mismatches[0]} and "
 
+                f"{mismatches[1]} "
 
-            return {
+                f"do not match"
 
-
-                "success": False,
-
-
-                "verification_status":
-
-                "FAILED",
+            )
 
 
-                "display_message":
+        elif len(mismatches) == 3:
 
-                "Aadhaar holder date of birth does not match"
+            message = (
 
-            }
+                "Aadhaar holder "
 
+                "name, date of birth and gender "
 
-        # =====================================
-        # BOTH MISMATCH
-        # =====================================
+                "do not match"
 
-        if (
-
-            name_match_status
-
-            ==
-
-            "NOT_MATCH"
-
-            and
+            )
 
 
-            dob_match_status
+        else:
 
-            ==
+            message = (
 
-            "NOT_MATCH"
+                "Aadhaar verification failed"
 
-        ):
-
-
-            return {
-
-
-                "success": False,
-
-
-                "verification_status":
-
-                "FAILED",
-
-
-                "display_message":
-
-                "Aadhaar holder name and date of birth do not match"
-
-            }
+            )
 
 
         return {
 
-
             "success": False,
 
+            "verification_status": "FAILED",
 
-            "verification_status":
-
-            "FAILED",
-
-
-            "display_message":
-
-            "Aadhaar verification failed"
+            "display_message": message
 
         }

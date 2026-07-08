@@ -87,10 +87,9 @@ class FaceMatchService:
 
 
 
-        ########################################
+        
         # Candidate uploaded selfie
-        ########################################
-
+        
 
         document = (
 
@@ -136,9 +135,8 @@ class FaceMatchService:
 
 
 
-        ########################################
         # Convert resident image
-        ########################################
+       
 
 
         image_bytes = (

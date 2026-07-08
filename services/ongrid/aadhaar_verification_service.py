@@ -144,6 +144,7 @@ class AadhaarVerificationService:
 
         )
 
+        
         # ==========================================
         # GET SESSION
         # ==========================================
@@ -187,15 +188,21 @@ class AadhaarVerificationService:
 
             )
 
-        response = json.loads(
+        try:
 
-            session[
+            response = json.loads(
 
-                "raw_response"
+                session["raw_response"]
 
-            ]
+            )
 
-        )
+        except Exception:
+
+            raise Exception(
+
+                "Invalid Aadhaar session response"
+
+            )
 
         # ==========================================
         # EXTRACT UIDAI DATA
@@ -218,6 +225,20 @@ class AadhaarVerificationService:
             )
 
         )
+
+        address = (
+
+            ovse_data.get(
+
+                "address"
+
+            )
+
+            or
+
+            ""
+
+)
          
         resident_image = (
 
@@ -232,6 +253,14 @@ class AadhaarVerificationService:
             ""
 
 ) 
+        if not resident_image:
+
+            raise Exception(
+
+                "Resident image not received from UIDAI"
+
+            )
+
 
         resident_name = (
 
@@ -246,6 +275,13 @@ class AadhaarVerificationService:
             ""
 
         )
+        if not resident_name:
+
+            raise Exception(
+
+                "Resident name not received from UIDAI"
+
+            )
 
         uidai_dob = (
 
@@ -261,48 +297,69 @@ class AadhaarVerificationService:
 
         )
 
+        if not uidai_dob:
+
+            raise Exception(
+
+                "Date of birth not received from UIDAI"
+
+            )
+
+        uidai_gender = (
+
+            ovse_data.get(
+
+                "gender"
+
+            )
+
+            or
+
+            ""
+
+        )
+        if not uidai_gender:
+
+            raise Exception(
+
+                "Gender not received from UIDAI"
+
+            )
+
         # ==========================================
         # NAME MATCH
         # ==========================================
+        ocr_name = full_name.strip().upper()
+        uidai_name = resident_name.strip().upper()
 
         name_match_status = (
-
             "MATCH"
-
-            if
-
-            full_name.strip().upper()
-
-            ==
-
-            resident_name.strip().upper()
-
-            else
-
-            "NOT_MATCH"
-
+            if ocr_name == uidai_name
+            else "NOT_MATCH"
         )
 
         # ==========================================
         # DOB MATCH
         # ==========================================
+        ocr_dob = date_of_birth.strip()
+        uidai_dob_clean = uidai_dob.strip()
 
         dob_match_status = (
-
             "MATCH"
+            if ocr_dob == uidai_dob_clean
+            else "NOT_MATCH"
+        )
 
-            if
+        # ==========================================
+        # GENDER MATCH
+        # ==========================================
+        ocr_gender = gender.strip().upper()
+        uidai_gender_clean = uidai_gender.strip().upper()
 
-            date_of_birth.strip()
-
-            ==
-
-            uidai_dob.strip()
-
-            else
-
-            "NOT_MATCH"
-
+        gender_match_status = (
+            "MATCH"
+            if ocr_gender == uidai_gender_clean
+            else "NOT_MATCH"
         )
 
         # ==========================================
@@ -329,14 +386,21 @@ class AadhaarVerificationService:
 
                 "MATCH"
 
+                and
+
+                gender_match_status
+
+                ==
+
+                "MATCH"
+
             )
 
             else
 
             "FAILED"
 
-        )
-
+)
         # ==========================================
         # SAVE RESULT
         # ==========================================
@@ -364,11 +428,17 @@ class AadhaarVerificationService:
             resident_image=
             resident_image,
 
+            address=
+            address,
+
             name_match_status=
             name_match_status,
 
             dob_match_status=
             dob_match_status,
+
+            gender_match_status=
+            gender_match_status,
 
             provider_name=
             "GRIDLINES",
@@ -415,7 +485,11 @@ class AadhaarVerificationService:
             "dob_match_status":
 
             dob_match_status,
+           
 
+           "gender_match_status":
+
+            gender_match_status,
 
             "provider":
 
