@@ -1,6 +1,7 @@
 import json
 
 from datetime import datetime
+from urllib import request
 
 from services.ongrid.ongrid_client import (
     OnGridClient
@@ -88,7 +89,9 @@ class CCRVFetchService:
         # API FAILURE
         ####################################################
 
-        if response.get("status") != 200:
+        status = response.get("status")
+
+        if status != 200:
 
             CCRVRepository.update_request_failed(
 
@@ -98,18 +101,105 @@ class CCRVFetchService:
 
             )
 
+            ####################################################
+            # 400
+            ####################################################
+
+            if status == 400:
+
+                raise Exception(
+
+                    "Gridlines rejected the CCRV Fetch request. Please verify the request payload."
+
+                )
+
+            ####################################################
+            # 401
+            ####################################################
+
+            if status == 401:
+
+                raise Exception(
+
+                    "Gridlines authentication failed. Please verify the API Key."
+
+                )
+
+            ####################################################
+            # 403
+            ####################################################
+
+            if status == 403:
+
+                raise Exception(
+
+                    "Gridlines access forbidden. Your account does not have permission to access the CCRV Fetch API."
+
+                )
+
+            ####################################################
+            # 404
+            ####################################################
+
+            if status == 404:
+
+                raise Exception(
+
+                    f"Gridlines could not find Transaction ID '{transaction_id}'. The report may not be generated yet or the transaction ID is invalid."
+
+                )
+
+            ####################################################
+            # 409
+            ####################################################
+
+            if status == 409:
+
+                raise Exception(
+
+                    "Gridlines reported a conflict while fetching the CCRV report."
+
+                )
+
+            ####################################################
+            # 429
+            ####################################################
+
+            if status == 429:
+
+                raise Exception(
+
+                    "Gridlines API rate limit exceeded. Please retry after some time."
+
+                )
+
+            ####################################################
+            # 500
+            ####################################################
+
+            if status >= 500:
+
+                raise Exception(
+
+                    "Gridlines server is temporarily unavailable. Please try again later."
+
+                )
+
+            ####################################################
+            # UNKNOWN ERROR
+            ####################################################
+
             raise Exception(
 
                 response.get(
 
-                    "message",
+                    "raw_response",
 
-                    "Unable to fetch CCRV report"
+                    "Unknown error received from Gridlines CCRV Fetch API."
 
                 )
 
             )
-
         ####################################################
         # RESPONSE DATA
         ####################################################
@@ -188,9 +278,9 @@ class CCRVFetchService:
 
             raise Exception(
 
-                "Unknown CCRV status"
+            f"Unexpected CCRV status received from Gridlines: {ccrv_status}"
 
-            )
+        )
 
         ####################################################
         # AVOID DUPLICATE SAVE
@@ -198,17 +288,15 @@ class CCRVFetchService:
 
         if CCRVRepository.result_exists(
 
-                request["id"]
+        request["id"]
 
-        ):
+):
 
-            return {
+            CCRVRepository.delete_existing_result(
 
-                "completed": True,
+        request["id"]
 
-                "message": "CCRV result already exists"
-
-            }
+    )
 
         ####################################################
         # REPORT

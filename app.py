@@ -24,9 +24,7 @@ from routes.indiankanoon_routes import (
 from routes.court_record_routes import (
     court_record_bp
 )
-from routes.salary_slip_routes import (
-    salary_slip_bp
-)
+
 from routes.report_routes import (
     report_bp
 )
@@ -56,6 +54,26 @@ from routes.face_match_routes import (
     face_match_bp
 
 )
+from routes.credit_bureau_routes import (
+    credit_bureau_bp
+)
+from routes.consent_routes import (
+    consent_bp
+)
+from routes.ccrv_callback_routes import (
+    ccrv_callback_bp
+)
+from routes.ccrv_routes import (
+    ccrv_bp
+)
+from routes.salary_slip_routes import (
+    salary_slip_bp
+)
+from routes.employment_routes import (
+    employment_bp
+)
+
+
 
 app = Flask(__name__)
 # JWT Configuration
@@ -115,12 +133,7 @@ app.register_blueprint(
 
     url_prefix="/api/v1"
 )
-app.register_blueprint(
 
-    salary_slip_bp,
-
-    url_prefix="/api/v1"
-)
 app.register_blueprint(
 
     report_bp,
@@ -159,6 +172,42 @@ app.register_blueprint(
 app.register_blueprint(
 
     face_match_bp,
+
+    url_prefix="/api/v1"
+
+)
+app.register_blueprint(
+
+    credit_bureau_bp,
+
+    url_prefix="/api/v1"
+
+)
+app.register_blueprint(
+
+    consent_bp,
+
+    url_prefix="/api/v1"
+
+)
+app.register_blueprint(
+
+    ccrv_callback_bp,
+
+    url_prefix="/api/v1"
+
+)
+app.register_blueprint(
+    ccrv_bp,
+    url_prefix="/api/v1"
+)
+app.register_blueprint(
+    salary_slip_bp,
+    url_prefix="/api/v1"
+)
+app.register_blueprint(
+
+    employment_bp,
 
     url_prefix="/api/v1"
 

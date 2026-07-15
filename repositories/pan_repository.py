@@ -5,7 +5,6 @@ class PanRepository:
 
     @staticmethod
     def save_pan_ocr_result(
-
         candidate_id,
         bgv_id,
         document_id,
@@ -17,15 +16,25 @@ class PanRepository:
         api_reference_id,
         raw_response
     ):
-
         connection = get_connection()
-
         cursor = connection.cursor()
-
-        query = """
-
-            INSERT INTO pan_ocr_results (
-
+        try:
+            query = """
+                INSERT INTO pan_ocr_results (
+                    candidate_id,
+                    bgv_id,
+                    document_id,
+                    pan_number,
+                    full_name,
+                    father_name,
+                    date_of_birth,
+                    provider_name,
+                    api_reference_id,
+                    raw_response
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            values = (
                 candidate_id,
                 bgv_id,
                 document_id,
@@ -36,60 +45,17 @@ class PanRepository:
                 provider_name,
                 api_reference_id,
                 raw_response
-
             )
-
-            VALUES (
-
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s
-
-            )
-
-        """
-
-        values = (
-
-            candidate_id,
-            bgv_id,
-            document_id,
-            pan_number,
-            full_name,
-            father_name,
-            date_of_birth,
-            provider_name,
-            api_reference_id,
-            raw_response
-        )
-
-        cursor.execute(
-            query,
-            values
-        )
-
-        connection.commit()
-
-        pan_ocr_result_id = (
-            cursor.lastrowid
-        )
-
-        cursor.close()
-
-        connection.close()
-
-        return pan_ocr_result_id
+            cursor.execute(query, values)
+            connection.commit()
+            pan_ocr_result_id = cursor.lastrowid
+            return pan_ocr_result_id
+        finally:
+            cursor.close()
+            connection.close()
 
     @staticmethod
     def save_pan_verification_result(
-
         candidate_id,
         bgv_id,
         pan_ocr_result_id,
@@ -104,15 +70,28 @@ class PanRepository:
         api_reference_id,
         raw_response
     ):
-
         connection = get_connection()
-
         cursor = connection.cursor()
-
-        query = """
-
-            INSERT INTO pan_verification_results (
-
+        try:
+            query = """
+                INSERT INTO pan_verification_results (
+                    candidate_id,
+                    bgv_id,
+                    pan_ocr_result_id,
+                    verification_status,
+                    pan_number,
+                    full_name,
+                    date_of_birth,
+                    pan_match_status,
+                    name_match_status,
+                    dob_match_status,
+                    provider_name,
+                    api_reference_id,
+                    raw_response
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            values = (
                 candidate_id,
                 bgv_id,
                 pan_ocr_result_id,
@@ -126,100 +105,53 @@ class PanRepository:
                 provider_name,
                 api_reference_id,
                 raw_response
-
             )
-
-            VALUES (
-
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s
-
-            )
-
-        """
-
-        values = (
-
-            candidate_id,
-            bgv_id,
-            pan_ocr_result_id,
-            verification_status,
-            pan_number,
-            full_name,
-            date_of_birth,
-            pan_match_status,
-            name_match_status,
-            dob_match_status,
-            provider_name,
-            api_reference_id,
-            raw_response
-        )
-
-        cursor.execute(
-            query,
-            values
-        )
-
-        connection.commit()
-
-        pan_verification_result_id = (
-            cursor.lastrowid
-        )
-
-        cursor.close()
-
-        connection.close()
-
-        return (
-            pan_verification_result_id
-        )
+            cursor.execute(query, values)
+            connection.commit()
+            pan_verification_result_id = cursor.lastrowid
+            return pan_verification_result_id
+        finally:
+            cursor.close()
+            connection.close()
 
     @staticmethod
-    def get_pan_verification_result(
-
-        candidate_id
-    ):
-
+    def get_pan_verification_result(candidate_id):
         connection = get_connection()
-
-        cursor = connection.cursor(
-            dictionary=True
-        )
-
-        cursor.execute(
-            """
-
-            SELECT *
-
-            FROM pan_verification_results
-
-            WHERE candidate_id = %s
-
-            ORDER BY id DESC
-
-            LIMIT 1
-
-            """,
-            (
-                candidate_id,
+        cursor = connection.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                """
+                SELECT *
+                FROM pan_verification_results
+                WHERE candidate_id = %s
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (candidate_id,)
             )
-        )
-
-        result = cursor.fetchone()
-
-        cursor.close()
-
-        connection.close()
-
-        return result
+            result = cursor.fetchone()
+            return result
+        finally:
+            cursor.close()
+            connection.close()
+    
+    @staticmethod
+    def get_pan_ocr_result(candidate_id):
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                """
+                SELECT *
+                FROM pan_ocr_results
+                WHERE candidate_id = %s
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (candidate_id,)
+            )
+            result = cursor.fetchone()
+            return result
+        finally:
+            cursor.close()
+            connection.close()

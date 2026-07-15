@@ -150,6 +150,12 @@ class Config:
     "AADHAAR_TEMPLATE_ID"
 
    )
+    
+    # ==========================================
+    # CALLBACK URL
+    # ==========================================
+    CCRV_CALLBACK_URL = "http://localhost:5001/api/v1/ccrv/callback"
+    
 # ==========================================
 # TESSERACT
 # ==========================================
@@ -159,5 +165,6 @@ pytesseract.pytesseract.tesseract_cmd = (
 )
 
 print("AI JWT SECRET:", Config.JWT_SECRET_KEY)
+
 
 
