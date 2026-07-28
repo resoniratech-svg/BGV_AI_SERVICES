@@ -159,6 +159,13 @@ class DrivingLicenseVerificationService:
 
         )
 
+#         ocr = DrivingLicenseRepository.get_driving_license_ocr_by_candidate(
+#     candidate_id
+# )
+
+#         if not ocr:
+#             raise Exception("Driving License OCR record not found")
+
         if not ocr:
 
             raise Exception(
@@ -196,6 +203,11 @@ class DrivingLicenseVerificationService:
         ###################################################
         # GRIDLINES FETCH
         ###################################################
+         
+        dob = ocr["date_of_birth"]
+
+        if dob:
+            dob = dob.strftime("%Y-%m-%d")
 
         fetch = (
 
@@ -206,7 +218,7 @@ class DrivingLicenseVerificationService:
                 ocr["license_number"],
 
                 date_of_birth=
-                ocr["date_of_birth"]
+                dob
 
             )
 
@@ -214,12 +226,15 @@ class DrivingLicenseVerificationService:
 
         dl_data = (
 
-            fetch.get(
-                "driving_license_data",
-                {}
-            )
+    fetch.get(
+        "data",
+        {}
+    ).get(
+        "driving_license_data",
+        {}
+    )
 
-        )
+)
 
         if not dl_data:
 

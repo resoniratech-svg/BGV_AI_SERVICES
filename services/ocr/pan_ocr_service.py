@@ -82,10 +82,9 @@ class PanOCRService:
             "Y"
         }
 
-        response = (
+        try:
 
-            OnGridClient
-            .post(
+            response = OnGridClient.post(
 
                 "/pan-api/ocr",
 
@@ -93,9 +92,15 @@ class PanOCRService:
 
             )
 
-        )
+        except Exception as e:
 
-        
+            raise Exception(
+
+                f"Unable to connect to Gridlines PAN OCR API. {str(e)}"
+
+    )
+
+       
 
         # ======================================
         # RESPONSE VALIDATION
@@ -107,15 +112,35 @@ class PanOCRService:
                 "Empty OCR response received"
             )
 
-        if response.get(
-            "status"
-        ) != 200:
+        if response.get("status") != 200:
 
             raise Exception(
 
                 response.get(
                     "message",
-                    "PAN OCR failed"
+                    "PAN OCR request failed."
+                )
+
+            )
+
+        # ======================================
+        # BUSINESS RESPONSE VALIDATION
+        # ======================================
+
+        data = response.get("data", {})
+
+        code = data.get("code")
+
+        if code != "1009":
+
+            raise Exception(
+
+                data.get(
+
+                    "message",
+
+                    "PAN OCR failed."
+
                 )
 
             )
@@ -124,40 +149,40 @@ class PanOCRService:
         # OCR DATA VALIDATION
         # ======================================
 
-        if not response.get(
-            "data",
-            {}
-        ).get(
-            "ocr_data"
-        ):
+        if not data.get("ocr_data"):
 
             raise Exception(
 
-                response.get(
-                    "data",
-                    {}
-                ).get(
-                    "message",
-                    "PAN OCR failed"
-                )
+                "PAN OCR data not found."
 
             )
-
         # ======================================
         # EXTRACT DATA
         # ======================================
 
         document_data = (
 
-            response
+    response.get(
 
-            ["data"]
+        "data",
 
-            ["ocr_data"]
+        {}
 
-            ["document"]
+    ).get(
 
-        )
+        "ocr_data",
+
+        {}
+
+    ).get(
+
+        "document",
+
+        {}
+
+    )
+
+)
 
         pan_number = (
 

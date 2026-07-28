@@ -75,17 +75,25 @@ class PassportOCRService:
 
         }
 
-        response = (
-            OnGridClient.post(
-                "/passport-api/ocr",
-                payload
-            )
-        )
+        try:
 
-        print("=" * 80)
-        print("PASSPORT OCR RESPONSE")
-        print(json.dumps(response, indent=4))
-        print("=" * 80)
+            response = OnGridClient.post(
+
+                "/passport-api/ocr",
+
+                payload
+
+            )
+
+        except Exception as e:
+
+            raise Exception(
+
+                f"Unable to connect to Gridlines Passport OCR API. {str(e)}"
+
+            )
+        
+        
 
         ####################################################
         # Validation
@@ -137,8 +145,14 @@ class PassportOCRService:
         ####################################################
 
         ocr = (
-            response["data"]["ocr_data"]
-        )
+
+        response
+
+        .get("data", {})
+
+        .get("ocr_data", {})
+
+)
 
         ####################################################
         # SAVE OCR RESULT

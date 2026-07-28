@@ -9,6 +9,7 @@ from services.ongrid.passport_verification_service import (
 from services.passport_result_service import (
     PassportResultService
 )
+from services.ocr.passport_ocr_service import PassportOCRService
 
 passport_bp = Blueprint(
     "passport",
@@ -155,3 +156,20 @@ def get_passport_result(candidate_id):
             "message": str(e)
 
         }), 500
+    
+    
+@passport_bp.route(
+    "/passport/ocr",
+    methods=["POST"]
+)
+def passport_ocr():
+
+    data = request.get_json()
+
+    result = PassportOCRService.extract_passport_data(
+        candidate_id=data["candidate_id"],
+        bgv_id=data["bgv_id"],
+        document_id=data["document_id"]
+    )
+
+    return jsonify(result)

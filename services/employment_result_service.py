@@ -32,9 +32,7 @@ class EmploymentResultService:
         if not result:
 
             raise Exception(
-
-                "Employment verification result not found."
-
+                f"Employment Verification result not found for Candidate ID: {candidate_id}."
             )
 
         ###########################################################

@@ -130,39 +130,6 @@ class AadhaarResultService:
         )
 
 
-        name_match_status = (
-
-            verification_result.get(
-
-                "name_match_status"
-
-            )
-
-        )
-
-
-        dob_match_status = (
-
-            verification_result.get(
-
-                "dob_match_status"
-
-            )
-
-        )
-
-
-        gender_match_status = (
-
-            verification_result.get(
-
-                "gender_match_status"
-
-            )
-
-        )
-
-
         # =====================================
         # VERIFIED
         # =====================================
@@ -183,95 +150,17 @@ class AadhaarResultService:
 
 
         # =====================================
-        # FIND ALL MISMATCHES
+        # FAILED
         # =====================================
-
-        mismatches = []
-
-
-        if name_match_status == "NOT_MATCH":
-
-            mismatches.append(
-
-                "name"
-
-            )
-
-
-        if dob_match_status == "NOT_MATCH":
-
-            mismatches.append(
-
-                "date of birth"
-
-            )
-
-
-        if gender_match_status == "NOT_MATCH":
-
-            mismatches.append(
-
-                "gender"
-
-            )
-
-
-        # =====================================
-        # BUILD MESSAGE
-        # =====================================
-
-        if len(mismatches) == 1:
-
-            message = (
-
-                f"Aadhaar holder {mismatches[0]} does not match"
-
-            )
-
-
-        elif len(mismatches) == 2:
-
-            message = (
-
-                f"Aadhaar holder "
-
-                f"{mismatches[0]} and "
-
-                f"{mismatches[1]} "
-
-                f"do not match"
-
-            )
-
-
-        elif len(mismatches) == 3:
-
-            message = (
-
-                "Aadhaar holder "
-
-                "name, date of birth and gender "
-
-                "do not match"
-
-            )
-
-
-        else:
-
-            message = (
-
-                "Aadhaar verification failed"
-
-            )
-
 
         return {
 
             "success": False,
 
-            "verification_status": "FAILED",
+            "verification_status": verification_status,
 
-            "display_message": message
+            "display_message":
+
+            "Aadhaar verification failed"
 
         }

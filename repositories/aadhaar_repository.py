@@ -230,91 +230,7 @@ class AadhaarRepository:
 
         connection.close()
 
-    # ==========================================
-    # SAVE OCR RESULT
-    # ==========================================
-
-    @staticmethod
-    def save_aadhaar_ocr_result(
-
-        candidate_id,
-        bgv_id,
-        document_id,
-        full_name,
-        date_of_birth,
-        gender,
-        provider_name,
-        api_reference_id,
-        raw_response
-
-    ):
-
-        connection = get_connection()
-
-        cursor = connection.cursor()
-
-        query = """
-
-            INSERT INTO aadhaar_ocr_results (
-
-                candidate_id,
-                bgv_id,
-                document_id,
-                full_name,
-                date_of_birth,
-                gender,
-                provider_name,
-                api_reference_id,
-                raw_response
-
-            )
-
-            VALUES (
-
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s
-
-            )
-
-        """
-
-        values = (
-
-            candidate_id,
-            bgv_id,
-            document_id,
-            full_name,
-            date_of_birth,
-            gender,
-            provider_name,
-            api_reference_id,
-            raw_response
-
-        )
-
-        cursor.execute(
-            query,
-            values
-        )
-
-        connection.commit()
-
-        aadhaar_ocr_result_id = (
-            cursor.lastrowid
-        )
-
-        cursor.close()
-
-        connection.close()
-
-        return aadhaar_ocr_result_id
+    
 
     # ==========================================
     # SAVE FINAL VERIFICATION RESULT
@@ -324,21 +240,27 @@ class AadhaarRepository:
     def save_aadhaar_verification_result(
 
         candidate_id,
-        bgv_id,
-        aadhaar_ocr_result_id,
-        verification_status,
-        resident_name,
-        date_of_birth,
-        address,
-        name_match_status,
-        dob_match_status,
-        gender_match_status,
-        resident_image,
-        provider_name,
-        api_reference_id,
-        raw_response
 
-    ):
+        bgv_id,
+
+        verification_status,
+
+        resident_name,
+
+        date_of_birth,
+
+        gender,
+
+        address,
+
+        resident_image,
+
+        provider_name,
+
+        api_reference_id,
+
+        raw_response
+):
 
         connection = get_connection()
 
@@ -350,14 +272,11 @@ class AadhaarRepository:
 
                 candidate_id,
                 bgv_id,
-                aadhaar_ocr_result_id,
                 verification_status,
                 resident_name,
                 date_of_birth,
+                gender,
                 address,
-                name_match_status,
-                dob_match_status,
-                gender_match_status,
                 resident_image,
                 provider_name,
                 api_reference_id,
@@ -377,10 +296,9 @@ class AadhaarRepository:
                 %s,
                 %s,
                 %s,
-                %s,
-                %s,
-                %s,
                 %s
+                
+                
 
             )
 
@@ -390,14 +308,11 @@ class AadhaarRepository:
 
             candidate_id,
             bgv_id,
-            aadhaar_ocr_result_id,
             verification_status,
             resident_name,
             date_of_birth,
+            gender,
             address,
-            name_match_status,
-            dob_match_status,
-            gender_match_status,
             resident_image,
             provider_name,
             api_reference_id,

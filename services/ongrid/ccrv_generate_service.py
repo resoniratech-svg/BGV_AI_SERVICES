@@ -73,7 +73,7 @@ class CCRVGenerateService:
 
             )
         ####################################################
-        # CONSENT
+        # CONSENT 
         ####################################################
 
         consent = (
@@ -93,7 +93,7 @@ class CCRVGenerateService:
         ####################################################
         # CONSENT STATUS
         ####################################################
-
+        
         if consent.get("consent_status") != "GIVEN":
 
             raise Exception(

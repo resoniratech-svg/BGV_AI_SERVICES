@@ -83,7 +83,11 @@ class OnGridDrivingLicenseService:
 
         except Exception as e:
 
-            raise Exception(str(e))
+            raise Exception(
+
+                f"Gridlines Driving License verification failed. {str(e)}"
+
+            )
 
         print("=" * 80)
         print("GRIDLINES DRIVING LICENSE FETCH RESPONSE")
@@ -154,4 +158,4 @@ class OnGridDrivingLicenseService:
         # RETURN COMPLETE RESPONSE
         ###################################################
 
-        return response
+        return response 

@@ -318,3 +318,27 @@ class DrivingLicenseRepository:
         connection.close()
 
         return result
+    
+    @staticmethod
+    def get_driving_license_ocr_by_candidate(candidate_id):
+
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT *
+            FROM driving_license_ocr_results
+            WHERE candidate_id=%s
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (candidate_id,)
+        )
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return result

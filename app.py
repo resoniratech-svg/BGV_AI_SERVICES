@@ -72,7 +72,12 @@ from routes.salary_slip_routes import (
 from routes.employment_routes import (
     employment_bp
 )
-
+from routes.bank_statement_routes import (
+    bank_statement_bp
+)
+from routes.bank_statement_callback_routes import (
+    bank_statement_callback_bp
+)
 
 
 app = Flask(__name__)
@@ -212,6 +217,18 @@ app.register_blueprint(
     url_prefix="/api/v1"
 
 )
+app.register_blueprint(
+    bank_statement_bp,
+    url_prefix="/api/v1/bank-statement"
+)
+app.register_blueprint(
+
+    bank_statement_callback_bp,
+
+    url_prefix="/api/v1"
+
+)
+
 
 # LOGIN API
 @app.route("/login", methods=["POST"])

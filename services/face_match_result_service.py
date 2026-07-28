@@ -2,7 +2,6 @@ from repositories.face_match_repository import (
     FaceMatchRepository
 )
 
-
 class FaceMatchResultService:
 
 
@@ -24,7 +23,7 @@ class FaceMatchResultService:
 
             )
 
-        )
+        )     
 
 
         if not result:
@@ -70,7 +69,7 @@ class FaceMatchResultService:
 
             )
 
-        )
+        ) 
 
 
         if verification_status == "MATCHED":

@@ -85,9 +85,9 @@ class DrivingLicenseOCRService:
 
         }
 
-        response = (
+        try:
 
-            OnGridClient.post(
+            response = OnGridClient.post(
 
                 "/dl-api/ocr",
 
@@ -95,12 +95,15 @@ class DrivingLicenseOCRService:
 
             )
 
-        )
+        except Exception as e:
 
-        print("=" * 80)
-        print("GRIDLINES DRIVING LICENSE OCR RESPONSE")
-        print(json.dumps(response, indent=4))
-        print("=" * 80)
+            raise Exception(
+
+                f"Unable to connect to Gridlines Driving License OCR API. {str(e)}"
+
+            )
+
+        
 
         ###################################################
         # VALIDATION
@@ -194,11 +197,9 @@ class DrivingLicenseOCRService:
 
         ocr = (
 
-            response
+        data
 
-            ["data"]
-
-            ["ocr_data"]
+        .get("ocr_data", {})
 
         )
 
