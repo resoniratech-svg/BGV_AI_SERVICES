@@ -6,21 +6,23 @@ from services.ongrid.passport_verification_service import (
     PassportVerificationService
 )
 
-from repositories.passport_repository import (
-    PassportRepository
+from services.passport_result_service import (
+    PassportResultService
 )
+from services.ocr.passport_ocr_service import PassportOCRService
 
 passport_bp = Blueprint(
-
-    "passport_bp",
+    "passport",
     __name__
 )
 
 
+# ======================================================
+# VERIFY PASSPORT
+# ======================================================
+
 @passport_bp.route(
-
     "/passport/verify",
-
     methods=["POST"]
 )
 def verify_passport():
@@ -29,132 +31,145 @@ def verify_passport():
 
         data = request.get_json()
 
-        candidate_id = data.get(
-            "candidate_id"
-        )
+        if not data:
 
-        bgv_id = data.get(
-            "bgv_id"
-        )
+            return jsonify({
 
-        document_id = data.get(
-            "document_id"
-        )
+                "status": "error",
 
-        # ======================================
-        # VALIDATIONS
-        # ======================================
+                "message": "Request body is required"
+
+            }), 400
+
+
+        candidate_id = data.get("candidate_id")
+        bgv_id = data.get("bgv_id")
+        document_id = data.get("document_id")
+
 
         if not candidate_id:
 
             return jsonify({
 
-                "success": False,
+                "status": "error",
 
-                "message": (
-                    "candidate_id is required"
-                )
+                "message": "candidate_id is required"
+
             }), 400
+
 
         if not bgv_id:
 
             return jsonify({
 
-                "success": False,
+                "status": "error",
 
-                "message": (
-                    "bgv_id is required"
-                )
+                "message": "bgv_id is required"
+
             }), 400
+
 
         if not document_id:
 
             return jsonify({
 
-                "success": False,
+                "status": "error",
 
-                "message": (
-                    "document_id is required"
-                )
+                "message": "document_id is required"
+
             }), 400
 
-        # ======================================
-        # VERIFY PASSPORT
-        # ======================================
 
         result = (
 
             PassportVerificationService
+
             .verify_passport(
 
-                candidate_id=(
-                    candidate_id
-                ),
+                candidate_id=candidate_id,
 
-                bgv_id=(
-                    bgv_id
-                ),
+                bgv_id=bgv_id,
 
-                document_id=(
-                    document_id
-                )
+                document_id=document_id
+
             )
+
         )
 
-        return jsonify(result), 200
+
+        return jsonify({
+
+            "status": "success",
+
+            "message": "Passport verification completed",
+
+            "data": result
+
+        })
+
 
     except Exception as e:
 
         return jsonify({
 
-            "success": False,
+            "status": "error",
 
             "message": str(e)
+
         }), 500
+
+
+# ======================================================
+# GET PASSPORT RESULT
+# ======================================================
+
+
 @passport_bp.route(
-
     "/passport/result/<int:candidate_id>",
-
     methods=["GET"]
 )
-def get_passport_result(
-    candidate_id
-):
+def get_passport_result(candidate_id):
 
     try:
 
         result = (
-            PassportRepository
-            .get_passport_result(
+            PassportResultService
+            .get_result(
                 candidate_id
             )
         )
 
-        if not result:
-
-            return jsonify({
-
-                "success": False,
-
-                "message": (
-                    "Passport result not found"
-                )
-            }), 404
-
         return jsonify({
 
-            "success": True,
+            "status": "success",
 
             "data": result
+
         }), 200
 
     except Exception as e:
 
         return jsonify({
 
-            "success": False,
+            "status": "error",
 
             "message": str(e)
+
         }), 500
     
     
+@passport_bp.route(
+    "/passport/ocr",
+    methods=["POST"]
+)
+def passport_ocr():
+
+    data = request.get_json()
+
+    result = PassportOCRService.extract_passport_data(
+        candidate_id=data["candidate_id"],
+        bgv_id=data["bgv_id"],
+        document_id=data["document_id"]
+    )
+
+    return jsonify(result)

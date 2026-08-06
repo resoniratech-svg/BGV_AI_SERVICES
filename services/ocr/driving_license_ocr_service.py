@@ -1,241 +1,373 @@
-import re
+import json
+import base64
 import os
-import glob
 
-from docx import image
-from config import Config
-import pytesseract
+from repositories.driving_license_repository import (
+    DrivingLicenseRepository
+)
 
-from PIL import Image
+from repositories.provider_usage_repository import (
+    ProviderUsageRepository
+)
 
-from repositories.document_repository import (
-    DocumentRepository
+from services.ongrid.ongrid_client import (
+    OnGridClient
 )
 
 
 class DrivingLicenseOCRService:
 
     @staticmethod
-    def extract_driving_license_data(
-        document_id
+    def process_ocr(
+
+            candidate_id,
+            bgv_id,
+            front_image_path,
+            back_image_path
+
     ):
 
-        document = (
-            DocumentRepository
-            .get_uploaded_document(
-                document_id
-            )
-        )
+        ###################################################
+        # VALIDATE FILES
+        ###################################################
 
-        if not document:
+        if not os.path.exists(front_image_path):
 
             raise Exception(
-                "Driving license document not found"
+                "Driving license front image not found"
             )
 
-        relative_path = document["file_path"]
-        if relative_path.startswith("uploads/"):
-            relative_path = relative_path.replace(
-                "uploads/",
-                "",
-                1
-            )
-
-        file_path = os.path.abspath(
-            document["file_path"]
-        )
-
-        # ==========================================
-        # DEBUG LOGS
-        # ==========================================
-
-        print("\n")
-        print("=" * 80)
-        print("DRIVING LICENSE OCR DEBUG")
-        print("=" * 80)
-
-        print(
-            "CURRENT WORKING DIRECTORY:",
-            os.getcwd()
-        )
-
-        print(
-            "DATABASE FILE PATH:",
-            document["file_path"]
-        )
-
-        print(
-            "ABSOLUTE PATH:",
-            file_path
-        )
-
-        print(
-            "FILE EXISTS:",
-            os.path.exists(file_path)
-        )
-
-        print(
-            "UPLOAD FILES FOUND:"
-        )
-
-        print(
-            glob.glob(
-                "uploads/**/*",
-                recursive=True
-            )
-        )
-
-        print("=" * 80)
-
-        # ==========================================
-        # FILE EXISTS CHECK
-        # ==========================================
-
-        if not os.path.exists(
-            file_path
-        ):
+        if not os.path.exists(back_image_path):
 
             raise Exception(
-                f"Document file not found: {file_path}"
+                "Driving license back image not found"
             )
 
-        # ==========================================
-        # FILE HEADER CHECK
-        # ==========================================
+        ###################################################
+        # CONVERT TO BASE64
+        ###################################################
 
-        file_size = os.path.getsize(
-            file_path
-        )
+        with open(front_image_path, "rb") as file:
 
-        print(
-            "FILE SIZE =",
-            file_size
-        )
+            front_base64 = (
 
-        with open(
-            file_path,
-            "rb"
-        ) as file:
+                base64.b64encode(
 
-            header = file.read(
-                30
+                    file.read()
+
+                ).decode("utf-8")
+
             )
 
-        print(
-            "FILE HEADER =",
-            header
-        )
+        with open(back_image_path, "rb") as file:
 
-        # ==========================================
-        # IMAGE OPEN
-        # ==========================================
+            back_base64 = (
+
+                base64.b64encode(
+
+                    file.read()
+
+                ).decode("utf-8")
+
+            )
+
+        ###################################################
+        # GRIDLINES OCR
+        ###################################################
+
+        payload = {
+
+            "front_image": front_base64,
+
+            "back_image": back_base64,
+
+            "consent": "Y"
+
+        }
 
         try:
 
-            image = Image.open(
-                file_path
-            )
+            response = OnGridClient.post(
 
-            print(
-                "IMAGE FORMAT =",
-                image.format
-            )
+                "/dl-api/ocr",
 
-            print(
-                "IMAGE SIZE =",
-                image.size
-            )
+                payload
 
-            print(
-                "IMAGE MODE =",
-                image.mode
             )
 
         except Exception as e:
 
             raise Exception(
-                f"PIL failed to open image: {str(e)}"
+
+                f"Unable to connect to Gridlines Driving License OCR API. {str(e)}"
+
             )
 
-        # ==========================================
-        # OCR
-        # ==========================================
+        
 
-        extracted_text = (
-            pytesseract.image_to_string(
-                image
-            )
-        )
+        ###################################################
+        # VALIDATION
+        ###################################################
 
-        print(
-            "OCR TEXT ="
-        )
+        if not response:
 
-        print(
-            extracted_text
-        )
+            raise Exception(
 
-        print(
-            "OCR TEXT RAW ="
-        )
+                "No response received from Gridlines Driving License OCR service."
 
-        print(
-            repr(extracted_text)
-        )
-        dl_candidates = re.findall(
-            r"[A-Z]{2}\d{2}\s*\d{4}\s*\d{4,8}",
-            extracted_text
-        )
-
-        print(
-            "DL CANDIDATES =",
-            dl_candidates
-        )
-
-        dl_number = None
-
-        if dl_candidates:
-
-            dl_number = (
-                dl_candidates[0]
-                .replace(" ", "")
-                .strip()
             )
 
-        # ==========================================
-        # DATE OF BIRTH
-        # ==========================================
+        if response.get("status") != 200:
 
-        date_of_birth = None
+            error_message = (
 
-        dob_match = re.search(
-            r"DOB\s*[:\-]?\s*(\d{2}[/-]\d{2}[/-]\d{4})",
-            extracted_text,
-            re.IGNORECASE
-        )
+                response.get("data", {})
 
-        if dob_match:
-            date_of_birth = (
-                dob_match.group(1)
+                .get("message")
+
+                or response.get("message")
+
+                or "Driving License OCR request failed."
+
             )
 
-        print(
-            "EXTRACTED DL NUMBER =",
-            dl_number
+            raise Exception(error_message)
+
+        data = response.get("data", {})
+
+        if data.get("code") != "1002":
+
+            raise Exception(
+
+                data.get(
+
+                    "message",
+
+                    "Unable to extract Driving License details from the uploaded document."
+
+                )
+
+            )
+
+        ocr_data = data.get("ocr_data")
+
+        if not ocr_data:
+
+            raise Exception(
+
+                "Driving License OCR data not found in provider response."
+
+            )
+
+        if not ocr_data.get("document_id"):
+
+            raise Exception(
+
+                "Driving License number could not be extracted from the uploaded document."
+
+            )
+
+        if not ocr_data.get("name"):
+
+            raise Exception(
+
+                "Candidate name could not be extracted from the uploaded document."
+
+            )
+
+        if not ocr_data.get("date_of_birth"):
+
+            raise Exception(
+
+                "Date of birth could not be extracted from the uploaded document."
+
+            )
+
+        if not ocr_data.get("address"):
+
+            raise Exception(
+
+                "Address could not be extracted from the uploaded document."
+
+            )
+
+        ###################################################
+        # OCR DATA
+        ###################################################
+
+        ocr = (
+
+        data
+
+        .get("ocr_data", {})
+
         )
 
-        print(
-            "EXTRACTED DOB =",
-            date_of_birth
+        ###################################################
+        # SAVE OCR RESULT
+        ###################################################
+
+        ocr_result_id = (
+
+            DrivingLicenseRepository
+
+            .save_driving_license_ocr_result(
+
+                candidate_id=candidate_id,
+
+                bgv_id=bgv_id,
+
+                document_id=ocr.get(
+                    "document_id"
+                ),
+
+                license_number=ocr.get(
+                    "document_id"
+                ),
+
+                full_name=ocr.get(
+                    "name"
+                ),
+
+                dependent_name=ocr.get(
+                    "dependent_name"
+                ),
+
+                date_of_birth=ocr.get(
+                    "date_of_birth"
+                ),
+
+                issue_date=ocr.get(
+                    "issued_date"
+                ),
+
+                expiry_date=ocr.get(
+                    "valid_till"
+                ),
+
+                place_of_issue=ocr.get(
+                    "place_of_issue"
+                ),
+
+                address=ocr.get(
+                    "address"
+                ),
+
+                provider_name="GRIDLINES",
+
+                api_reference_id=response.get(
+                    "request_id"
+                ),
+
+                raw_response=json.dumps(
+                    response
+                )
+
+            )
+
         )
 
-        print("=" * 80)
+        ###################################################
+        # PROVIDER USAGE
+        ###################################################
+
+        ProviderUsageRepository.increment_usage(
+
+            provider_name="GRIDLINES",
+
+            verification_type="DRIVING_LICENSE_OCR"
+
+        )
+
+        ###################################################
+        # RETURN
+        ###################################################
 
         return {
 
-            "driving_license_number": dl_number,
+            "ocr_result_id":
 
-            "date_of_birth": date_of_birth,
+            ocr_result_id,
 
-            "raw_text": extracted_text
+            "license_number":
+
+            ocr.get(
+
+                "document_id"
+
+            ),
+
+            "full_name":
+
+            ocr.get(
+
+                "name"
+
+            ),
+
+            "dependent_name":
+
+            ocr.get(
+
+                "dependent_name"
+
+            ),
+
+            "date_of_birth":
+
+            ocr.get(
+
+                "date_of_birth"
+
+            ),
+
+            "issue_date":
+
+            ocr.get(
+
+                "issued_date"
+
+            ),
+
+            "expiry_date":
+
+            ocr.get(
+
+                "valid_till"
+
+            ),
+
+            "place_of_issue":
+
+            ocr.get(
+
+                "place_of_issue"
+
+            ),
+
+            "address":
+
+            ocr.get(
+
+                "address"
+
+            ),
+
+            "provider_name":
+
+            "GRIDLINES",
+
+            "api_reference_id":
+
+            response.get(
+
+                "request_id"
+
+            ),
+
+            "raw_response":
+
+            response
+
         }
+    

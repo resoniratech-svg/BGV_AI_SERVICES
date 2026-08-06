@@ -2,117 +2,203 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 
-import os
-import uuid
+from services.salary_slip_ocr_service import (
+    SalarySlipOCRService
+)
 
-from werkzeug.utils import secure_filename
-
-from config import Config
-
-from services.salary_slip_service import SalarySlipService
-
-salary_slip_bp = Blueprint("salary_slip_bp", __name__)
+from repositories.salary_slip_repository import (
+    SalarySlipRepository
+)
 
 
-@salary_slip_bp.route("/salary-slip/verify", methods=["POST"])
-def verify_salary_slip():
+salary_slip_bp = Blueprint(
+
+    "salary_slip_bp",
+
+    __name__
+
+)
+
+
+###############################################################
+# SALARY SLIP OCR
+###############################################################
+
+@salary_slip_bp.route(
+
+    "/salary-slip/ocr",
+
+    methods=["POST"]
+
+)
+def salary_slip_ocr():
 
     try:
-        # ==========================================
-        # VALIDATE FILE
-        # ==========================================
 
-        if "file" not in request.files:
-            return jsonify(
-                {"success": False, "message": ("Salary slip file missing")}
-            ), 400
+        ###################################################
+        # REQUEST
+        ###################################################
 
-        salary_slip_file = request.files["file"]
+        data = request.get_json()
 
-        if salary_slip_file.filename == "":
-            return jsonify(
-                {"success": False, "message": ("Invalid salary slip file")}
-            ), 400
+        if not data:
 
-        # ==========================================
-        # VALIDATE CANDIDATE ID
-        # ==========================================
+            return jsonify({
 
-        candidate_id = request.form.get("candidate_id")
+                "success": False,
 
-        if not candidate_id:
-            return jsonify({"success": False, "message": ("candidate_id missing")}), 400
+                "message": "Request body is required."
 
-        # ==========================================
-        # SECURE FILE NAME
-        # ==========================================
+            }), 400
 
-        original_filename = secure_filename(salary_slip_file.filename)
+        ###################################################
+        # INPUTS
+        ###################################################
 
-        file_extension = os.path.splitext(original_filename)[1]
+        candidate_id = data.get(
 
-        unique_filename = f"{uuid.uuid4()}{file_extension}"
+            "candidate_id"
 
-        # ==========================================
-        # CREATE UPLOAD DIRECTORY
-        # ==========================================
-
-        os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
-
-        file_path = os.path.join(Config.UPLOAD_FOLDER, unique_filename)
-
-        # ==========================================
-        # SAVE FILE
-        # ==========================================
-
-        salary_slip_file.save(file_path)
-
-        # ==========================================
-        # VERIFY SALARY SLIP
-        # ==========================================
-
-        result = SalarySlipService.verify_salary_slip(
-            file_path=file_path, candidate_id=candidate_id
         )
 
-        # ==========================================
-        # API FAILURE
-        # ==========================================
+        bgv_id = data.get(
 
-        if not result.get("success"):
-            return jsonify(
-                {
+            "bgv_id"
+
+        )
+
+        document_id = data.get(
+
+            "document_id"
+
+        )
+
+        ###################################################
+        # VALIDATIONS
+        ###################################################
+
+        required_fields = {
+
+            "candidate_id": candidate_id,
+
+            "bgv_id": bgv_id,
+
+            "document_id": document_id
+
+        }
+
+        for field, value in required_fields.items():
+
+            if value is None or str(value).strip() == "":
+
+                return jsonify({
+
                     "success": False,
-                    "message": result.get("message"),
-                    "error": result.get("error"),
-                }
-            ), 400
 
-        # ==========================================
-        # SUCCESS RESPONSE
-        # ==========================================
+                    "message": f"{field} is required."
+
+                }), 400
+
+        ###################################################
+        # OCR
+        ###################################################
+
+        result = (
+
+            SalarySlipOCRService
+            .verify_salary_slip(
+
+                candidate_id=candidate_id,
+
+                bgv_id=bgv_id,
+
+                document_id=document_id
+
+            )
+
+        )
 
         return jsonify(
-            {
-                "success": True,
-                "message": ("Salary slip verified successfully"),
-                "data": result,
-            }
+
+            result
+
         ), 200
 
-    except Exception as e:
-        return jsonify(
-            {
+    except Exception as error:
+
+        print("=" * 80)
+        print("SALARY SLIP OCR ERROR")
+        print(error)
+        print("=" * 80)
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(error)
+
+        }), 500
+
+
+###############################################################
+# GET SALARY SLIP OCR RESULT
+###############################################################
+
+@salary_slip_bp.route(
+
+    "/salary-slip/result/<int:candidate_id>",
+
+    methods=["GET"]
+
+)
+def get_salary_slip_result(
+
+        candidate_id
+
+):
+
+    try:
+
+        result = (
+
+            SalarySlipRepository
+            .get_salary_slip_ocr_result(
+
+                candidate_id
+
+            )
+
+        )
+
+        if not result:
+
+            return jsonify({
+
                 "success": False,
-                "message": ("Salary slip verification failed"),
-                "error": str(e),
-            }
-        ), 500
 
+                "message": "Salary Slip OCR result not found."
 
-@salary_slip_bp.route("/salary-slip/result/<int:candidate_id>", methods=["GET"])
-def get_salary_slip_result(candidate_id):
+            }), 404
 
-    result = SalarySlipService.get_salary_slip_result(candidate_id)
+        return jsonify({
 
-    return jsonify(result)
+            "success": True,
+
+            "data": result
+
+        }), 200
+
+    except Exception as error:
+
+        print("=" * 80)
+        print("SALARY SLIP RESULT ERROR")
+        print(error)
+        print("=" * 80)
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(error)
+
+        }), 500

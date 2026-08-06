@@ -5,19 +5,31 @@ from flask import jsonify
 from services.driving_license_verification_service import (
     DrivingLicenseVerificationService
 )
-from repositories.driving_license_repository import (
-    DrivingLicenseRepository
+
+from services.driving_license_result_service import (
+    DrivingLicenseResultService
 )
+
+
 driving_license_bp = Blueprint(
 
     "driving_license_bp",
+
     __name__
+
 )
 
 
+# =====================================================
+# VERIFY DRIVING LICENSE
+# =====================================================
+
 @driving_license_bp.route(
+
     "/driving-license/verify",
+
     methods=["POST"]
+
 )
 def verify_driving_license():
 
@@ -41,9 +53,9 @@ def verify_driving_license():
             "back_document_id"
         )
 
-        # ======================================
+        ###################################################
         # VALIDATIONS
-        # ======================================
+        ###################################################
 
         if not candidate_id:
 
@@ -51,9 +63,8 @@ def verify_driving_license():
 
                 "success": False,
 
-                "message": (
-                    "candidate_id is required"
-                )
+                "message": "candidate_id is required"
+
             }), 400
 
         if not bgv_id:
@@ -62,9 +73,8 @@ def verify_driving_license():
 
                 "success": False,
 
-                "message": (
-                    "bgv_id is required"
-                )
+                "message": "bgv_id is required"
+
             }), 400
 
         if not front_document_id:
@@ -73,9 +83,8 @@ def verify_driving_license():
 
                 "success": False,
 
-                "message": (
-                    "front_document_id is required"
-                )
+                "message": "front_document_id is required"
+
             }), 400
 
         if not back_document_id:
@@ -84,14 +93,18 @@ def verify_driving_license():
 
                 "success": False,
 
-                "message": (
-                    "back_document_id is required"
-                )
+                "message": "back_document_id is required"
+
             }), 400
+
+        ###################################################
+        # VERIFY
+        ###################################################
 
         result = (
 
             DrivingLicenseVerificationService
+
             .verify_driving_license(
 
                 candidate_id=candidate_id,
@@ -101,52 +114,19 @@ def verify_driving_license():
                 front_document_id=front_document_id,
 
                 back_document_id=back_document_id
+
             )
+
         )
-
-        return jsonify(
-            result
-        ), 200
-
-    except Exception as e:
-
-        return jsonify({
-
-            "success": False,
-
-            "message": str(e)
-        }), 500
-@driving_license_bp.route(
-        "/driving-license/result/<int:candidate_id>",
-        methods=["GET"]
-        )
-def get_driving_license_result(
-    candidate_id
-    ):
-    try:
-        result = (
-            DrivingLicenseRepository
-            .get_driving_license_result(
-                candidate_id
-            )
-        )
-
-        if not result:
-
-            return jsonify({
-
-                "success": False,
-
-                "message": (
-                    "Driving License result not found"
-                )
-            }), 404
 
         return jsonify({
 
             "success": True,
 
+            "message": "Driving License verification completed successfully",
+
             "data": result
+
         }), 200
 
     except Exception as e:
@@ -156,4 +136,55 @@ def get_driving_license_result(
             "success": False,
 
             "message": str(e)
+
+        }), 500
+
+
+# =====================================================
+# GET RESULT
+# =====================================================
+
+@driving_license_bp.route(
+
+    "/driving-license/result/<int:candidate_id>",
+
+    methods=["GET"]
+
+)
+def get_driving_license_result(
+
+        candidate_id
+
+):
+
+    try:
+
+        result = (
+
+            DrivingLicenseResultService
+
+            .get_result(
+
+                candidate_id
+
+            )
+
+        )
+
+        return jsonify({
+
+            "success": True,
+
+            "data": result
+
+        }), 200
+
+    except Exception as e:
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(e)
+
         }), 500
