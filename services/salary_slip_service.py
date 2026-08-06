@@ -355,3 +355,40 @@ class SalarySlipService:
                 "message": "Salary slip verification failed",
                 "error": str(e),
             }
+
+    @staticmethod
+    def get_salary_slip_result(candidate_id):
+
+        result = SalarySlipRepository.get_salary_slip_result(candidate_id)
+
+        if not result:
+            return {"success": False, "message": "Result not found"}
+
+        fraud_flags = result.get("fraud_flags")
+
+        if fraud_flags:
+            fraud_flags = json.loads(fraud_flags)
+
+        else:
+            fraud_flags = []
+
+        return {
+            "success": True,
+            "data": {
+                "salary_slip_id": result["id"],
+                "verification_id": result["verification_id"],
+                "candidate_id": candidate_id,
+                "salary_data": {
+                    "employee_name": result["employee_name"],
+                    "employee_id": result["employee_id"],
+                    "designation": result["designation"],
+                    "salary_amount": result["salary_amount"],
+                    "gross_salary": result["gross_salary"],
+                    "pan_number": result["pan_number"],
+                    "uan_number": result["uan_number"],
+                    "bank_account_last4": result["bank_account_last4"],
+                },
+                "fraud_score": result["fraud_score"],
+                "fraud_flags": fraud_flags,
+            },
+        }

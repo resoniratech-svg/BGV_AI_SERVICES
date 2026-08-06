@@ -2,10 +2,8 @@ from db import get_connection
 
 
 class SalarySlipRepository:
-
     @staticmethod
     def save_salary_slip_result(
-
         candidate_id,
         verification_id,
         employee_name,
@@ -22,7 +20,7 @@ class SalarySlipRepository:
         fraud_flags,
         extraction_status,
         provider_name,
-        raw_text
+        raw_text,
     ):
 
         connection = get_connection()
@@ -75,7 +73,6 @@ class SalarySlipRepository:
         """
 
         values = (
-
             candidate_id,
             verification_id,
             employee_name,
@@ -92,7 +89,7 @@ class SalarySlipRepository:
             fraud_flags,
             extraction_status,
             provider_name,
-            raw_text
+            raw_text,
         )
 
         cursor.execute(query, values)
@@ -109,13 +106,12 @@ class SalarySlipRepository:
 
     @staticmethod
     def save_api_log(
-
         module_name,
         provider_name,
         endpoint,
         request_payload,
         response_payload,
-        status_code
+        status_code,
     ):
 
         connection = get_connection()
@@ -146,13 +142,12 @@ class SalarySlipRepository:
         """
 
         values = (
-
             module_name,
             provider_name,
             endpoint,
             request_payload,
             response_payload,
-            status_code
+            status_code,
         )
 
         cursor.execute(query, values)
@@ -165,7 +160,6 @@ class SalarySlipRepository:
 
     @staticmethod
     def save_salary_slip_document(
-
         candidate_id,
         verification_id,
         original_file_name,
@@ -173,7 +167,7 @@ class SalarySlipRepository:
         file_path,
         file_size,
         mime_type,
-        upload_status
+        upload_status,
     ):
 
         connection = get_connection()
@@ -208,7 +202,6 @@ class SalarySlipRepository:
         """
 
         values = (
-
             candidate_id,
             verification_id,
             original_file_name,
@@ -216,7 +209,7 @@ class SalarySlipRepository:
             file_path,
             file_size,
             mime_type,
-            upload_status
+            upload_status,
         )
 
         cursor.execute(query, values)
@@ -229,14 +222,13 @@ class SalarySlipRepository:
 
     @staticmethod
     def save_salary_slip_log(
-
         candidate_id,
         verification_id,
         file_name,
         request_payload,
         response_payload,
         processing_status,
-        error_message
+        error_message,
     ):
 
         connection = get_connection()
@@ -269,14 +261,13 @@ class SalarySlipRepository:
         """
 
         values = (
-
             candidate_id,
             verification_id,
             file_name,
             request_payload,
             response_payload,
             processing_status,
-            error_message
+            error_message,
         )
 
         cursor.execute(query, values)
@@ -289,12 +280,7 @@ class SalarySlipRepository:
 
     @staticmethod
     def save_fraud_check(
-
-        salary_slip_id,
-        fraud_type,
-        fraud_score,
-        fraud_status,
-        remarks
+        salary_slip_id, fraud_type, fraud_score, fraud_status, remarks
     ):
 
         connection = get_connection()
@@ -322,14 +308,7 @@ class SalarySlipRepository:
             )
         """
 
-        values = (
-
-            salary_slip_id,
-            fraud_type,
-            fraud_score,
-            fraud_status,
-            remarks
-        )
+        values = (salary_slip_id, fraud_type, fraud_score, fraud_status, remarks)
 
         cursor.execute(query, values)
 
@@ -338,3 +317,27 @@ class SalarySlipRepository:
         cursor.close()
 
         connection.close()
+
+    @staticmethod
+    def get_salary_slip_result(candidate_id):
+
+        connection = get_connection()
+
+        cursor = connection.cursor(dictionary=True)
+
+        query = """
+            SELECT *
+            FROM salary_slip_results
+            WHERE candidate_id=%s
+            ORDER BY id DESC
+            LIMIT 1
+        """
+
+        cursor.execute(query, (candidate_id,))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return result

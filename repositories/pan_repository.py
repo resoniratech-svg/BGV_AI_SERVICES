@@ -2,10 +2,8 @@ from db import get_connection
 
 
 class PanRepository:
-
     @staticmethod
     def save_pan_ocr_result(
-
         candidate_id,
         bgv_id,
         document_id,
@@ -15,7 +13,7 @@ class PanRepository:
         date_of_birth,
         provider_name,
         api_reference_id,
-        raw_response
+        raw_response,
     ):
 
         connection = get_connection()
@@ -57,7 +55,6 @@ class PanRepository:
         """
 
         values = (
-
             candidate_id,
             bgv_id,
             document_id,
@@ -67,19 +64,14 @@ class PanRepository:
             date_of_birth,
             provider_name,
             api_reference_id,
-            raw_response
+            raw_response,
         )
 
-        cursor.execute(
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
-        pan_ocr_result_id = (
-            cursor.lastrowid
-        )
+        pan_ocr_result_id = cursor.lastrowid
 
         cursor.close()
 
@@ -89,7 +81,6 @@ class PanRepository:
 
     @staticmethod
     def save_pan_verification_result(
-
         candidate_id,
         bgv_id,
         pan_ocr_result_id,
@@ -102,7 +93,7 @@ class PanRepository:
         dob_match_status,
         provider_name,
         api_reference_id,
-        raw_response
+        raw_response,
     ):
 
         connection = get_connection()
@@ -150,7 +141,6 @@ class PanRepository:
         """
 
         values = (
-
             candidate_id,
             bgv_id,
             pan_ocr_result_id,
@@ -163,39 +153,27 @@ class PanRepository:
             dob_match_status,
             provider_name,
             api_reference_id,
-            raw_response
+            raw_response,
         )
 
-        cursor.execute(
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
-        pan_verification_result_id = (
-            cursor.lastrowid
-        )
+        pan_verification_result_id = cursor.lastrowid
 
         cursor.close()
 
         connection.close()
 
-        return (
-            pan_verification_result_id
-        )
+        return pan_verification_result_id
 
     @staticmethod
-    def get_pan_verification_result(
-
-        candidate_id
-    ):
+    def get_pan_verification_result(candidate_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -211,9 +189,7 @@ class PanRepository:
             LIMIT 1
 
             """,
-            (
-                candidate_id,
-            )
+            (candidate_id,),
         )
 
         result = cursor.fetchone()
@@ -223,3 +199,37 @@ class PanRepository:
         connection.close()
 
         return result
+
+    @staticmethod
+    def get_pan_ocr_result(candidate_id):
+
+        connection = get_connection()
+
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+
+            SELECT *
+
+            FROM pan_ocr_results
+
+            WHERE candidate_id=%s
+
+            ORDER BY id DESC
+
+            LIMIT 1
+
+            """,
+            (candidate_id,),
+        )
+
+        result = cursor.fetchone()
+
+        cursor.close()
+
+        connection.close()
+
+        return result
+
+    ###PATH:BGV_AI_SERVICES/repositories/__init__.py

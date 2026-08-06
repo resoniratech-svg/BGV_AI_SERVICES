@@ -2,7 +2,6 @@ from db import get_connection
 
 
 class AadhaarRepository:
-
     # ==========================================
     # SAVE AADHAAR SESSION
     # ==========================================
@@ -17,7 +16,7 @@ class AadhaarRepository:
         session_status,
         provider_name,
         api_reference_id,
-        raw_response
+        raw_response,
     ):
 
         connection = get_connection()
@@ -57,7 +56,6 @@ class AadhaarRepository:
         """
 
         values = (
-
             candidate_id,
             bgv_id,
             transaction_id,
@@ -66,20 +64,14 @@ class AadhaarRepository:
             session_status,
             provider_name,
             api_reference_id,
-            raw_response
-
+            raw_response,
         )
 
-        cursor.execute(
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
-        aadhaar_session_id = (
-            cursor.lastrowid
-        )
+        aadhaar_session_id = cursor.lastrowid
 
         cursor.close()
 
@@ -92,15 +84,11 @@ class AadhaarRepository:
     # ==========================================
 
     @staticmethod
-    def get_aadhaar_session(
-        candidate_id
-    ):
+    def get_aadhaar_session(candidate_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         query = """
 
@@ -116,15 +104,7 @@ class AadhaarRepository:
 
         """
 
-        cursor.execute(
-
-            query,
-
-            (
-                candidate_id,
-            )
-
-        )
+        cursor.execute(query, (candidate_id,))
 
         result = cursor.fetchone()
 
@@ -139,17 +119,11 @@ class AadhaarRepository:
     # ==========================================
 
     @staticmethod
-    def get_aadhaar_session_by_transaction_id(
-
-        transaction_id
-
-    ):
+    def get_aadhaar_session_by_transaction_id(transaction_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         query = """
 
@@ -163,15 +137,7 @@ class AadhaarRepository:
 
         """
 
-        cursor.execute(
-
-            query,
-
-            (
-                transaction_id,
-            )
-
-        )
+        cursor.execute(query, (transaction_id,))
 
         result = cursor.fetchone()
 
@@ -186,13 +152,7 @@ class AadhaarRepository:
     # ==========================================
 
     @staticmethod
-    def update_session_status(
-
-        transaction_id,
-        session_status,
-        raw_response=None
-
-    ):
+    def update_session_status(transaction_id, session_status, raw_response=None):
 
         connection = get_connection()
 
@@ -212,17 +172,7 @@ class AadhaarRepository:
 
         """
 
-        cursor.execute(
-
-            query,
-
-            (
-                session_status,
-                raw_response,
-                transaction_id
-            )
-
-        )
+        cursor.execute(query, (session_status, raw_response, transaction_id))
 
         connection.commit()
 
@@ -236,7 +186,6 @@ class AadhaarRepository:
 
     @staticmethod
     def save_aadhaar_ocr_result(
-
         candidate_id,
         bgv_id,
         document_id,
@@ -245,8 +194,7 @@ class AadhaarRepository:
         gender,
         provider_name,
         api_reference_id,
-        raw_response
-
+        raw_response,
     ):
 
         connection = get_connection()
@@ -286,7 +234,6 @@ class AadhaarRepository:
         """
 
         values = (
-
             candidate_id,
             bgv_id,
             document_id,
@@ -295,20 +242,14 @@ class AadhaarRepository:
             gender,
             provider_name,
             api_reference_id,
-            raw_response
-
+            raw_response,
         )
 
-        cursor.execute(
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
-        aadhaar_ocr_result_id = (
-            cursor.lastrowid
-        )
+        aadhaar_ocr_result_id = cursor.lastrowid
 
         cursor.close()
 
@@ -322,7 +263,6 @@ class AadhaarRepository:
 
     @staticmethod
     def save_aadhaar_verification_result(
-
         candidate_id,
         bgv_id,
         aadhaar_ocr_result_id,
@@ -334,8 +274,7 @@ class AadhaarRepository:
         resident_image,
         provider_name,
         api_reference_id,
-        raw_response
-
+        raw_response,
     ):
 
         connection = get_connection()
@@ -381,7 +320,6 @@ class AadhaarRepository:
         """
 
         values = (
-
             candidate_id,
             bgv_id,
             aadhaar_ocr_result_id,
@@ -393,20 +331,14 @@ class AadhaarRepository:
             resident_image,
             provider_name,
             api_reference_id,
-            raw_response
-
+            raw_response,
         )
 
-        cursor.execute(
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
-        verification_result_id = (
-            cursor.lastrowid
-        )
+        verification_result_id = cursor.lastrowid
 
         cursor.close()
 
@@ -419,17 +351,11 @@ class AadhaarRepository:
     # ==========================================
 
     @staticmethod
-    def get_aadhaar_verification_result(
-
-        candidate_id
-
-    ):
+    def get_aadhaar_verification_result(candidate_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         query = """
 
@@ -445,15 +371,7 @@ class AadhaarRepository:
 
         """
 
-        cursor.execute(
-
-            query,
-
-            (
-                candidate_id,
-            )
-
-        )
+        cursor.execute(query, (candidate_id,))
 
         result = cursor.fetchone()
 

@@ -1,12 +1,6 @@
 import os
 import uuid
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle
-)
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import letter
@@ -14,7 +8,6 @@ from repositories.report_repository import ReportRepository
 
 
 class ReportService:
-    
     @staticmethod
     def generate_bgv_report(candidate_id):
 
@@ -29,9 +22,7 @@ class ReportService:
 
         candidate = ReportRepository.get_candidate_details(candidate_id)
         if not candidate:
-            raise Exception(
-                f"Candidate not found: {candidate_id}"
-            )
+            raise Exception(f"Candidate not found: {candidate_id}")
 
         # ==========================================
         # CREATE REPORT FOLDER
@@ -67,25 +58,25 @@ class ReportService:
         # ==========================================
         # 1. CANDIDATE SUMMARY (With Fixed Widths)
         # ==========================================
-        elements.append(
-            Paragraph("1. CANDIDATE SUMMARY", styles["Heading2"])
-        )
+        elements.append(Paragraph("1. CANDIDATE SUMMARY", styles["Heading2"]))
 
         candidate_table = Table(
             [
                 ["Full Name", summary.get("candidate_name", "-")],
                 ["Email", summary.get("email", "-")],
                 ["Phone", summary.get("phone", "-")],
-                ["Candidate ID", str(candidate_id)]
+                ["Candidate ID", str(candidate_id)],
             ],
-            colWidths=[150, 300]
+            colWidths=[150, 300],
         )
 
         candidate_table.setStyle(
-            TableStyle([
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),
-                ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey)
-            ])
+            TableStyle(
+                [
+                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                    ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+                ]
+            )
         )
 
         elements.append(candidate_table)
@@ -94,9 +85,7 @@ class ReportService:
         # ==========================================
         # 2. VERIFICATION MODULE STATUS (With Fixed Widths)
         # ==========================================
-        elements.append(
-            Paragraph("2. VERIFICATION MODULE STATUS", styles["Heading2"])
-        )
+        elements.append(Paragraph("2. VERIFICATION MODULE STATUS", styles["Heading2"]))
 
         verification_table = Table(
             [
@@ -113,17 +102,19 @@ class ReportService:
                 ["Credit Bureau", get_status(summary.get("credit_status"))],
                 ["Court Record", get_status(summary.get("court_status"))],
                 ["Watchlist", get_status(summary.get("watchlist_status"))],
-                ["Deepfake Detection", get_status(summary.get("deepfake_status"))]
+                ["Deepfake Detection", get_status(summary.get("deepfake_status"))],
             ],
-            colWidths=[250, 200]
+            colWidths=[250, 200],
         )
 
         verification_table.setStyle(
-            TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold")
-            ])
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ]
+            )
         )
 
         elements.append(verification_table)
@@ -132,9 +123,7 @@ class ReportService:
         # ==========================================
         # 3. FINAL EXECUTIVE ASSESSMENT
         # ==========================================
-        elements.append(
-            Paragraph("3. FINAL EXECUTIVE ASSESSMENT", styles["Heading2"])
-        )
+        elements.append(Paragraph("3. FINAL EXECUTIVE ASSESSMENT", styles["Heading2"]))
 
         # Cleaned & Deduplicated Status Determinations
         overall_status_db_value = summary.get("overall_status")
@@ -152,18 +141,17 @@ class ReportService:
         risk_level = get_status(summary.get("risk_level"))
 
         final_table = Table(
-            [
-                ["Overall Status", overall_status],
-                ["Risk Level", risk_level]
-            ],
-            colWidths=[150, 300]
+            [["Overall Status", overall_status], ["Risk Level", risk_level]],
+            colWidths=[150, 300],
         )
 
         final_table.setStyle(
-            TableStyle([
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),
-                ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey)
-            ])
+            TableStyle(
+                [
+                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                    ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+                ]
+            )
         )
 
         elements.append(final_table)
@@ -173,9 +161,7 @@ class ReportService:
             Paragraph("Authorized Signature __________________", styles["BodyText"])
         )
         elements.append(Spacer(1, 10))
-        elements.append(
-            Paragraph("Date __________________", styles["BodyText"])
-        )
+        elements.append(Paragraph("Date __________________", styles["BodyText"]))
 
         # ==========================================
         # BUILD PDF
@@ -198,36 +184,47 @@ class ReportService:
             "file_name": file_name,
             "file_path": file_path,
             "file_url": file_path,
-            "storage_provider": "LOCAL_STORAGE"
+            "storage_provider": "LOCAL_STORAGE",
         }
 
         print("REPORT DATA")
         print(report_data)
 
         try:
-            # Inline Trace Boundaries Added Right Before Query Execution
             print("=" * 50)
             print("DB STATUS =", overall_status)
             print("ENUM STATUS =", verification_status)
             print("REPORT DATA =", report_data)
             print("=" * 50)
 
-            ReportRepository.save_report_details(report_data)
-            print("REPORT SAVED")
+            existing_report = ReportRepository.get_report_by_candidate(candidate_id)
+
+            if existing_report:
+                print("REPORT ALREADY EXISTS")
+
+                ReportRepository.update_report_details(report_data)
+
+                print("REPORT UPDATED")
+
+            else:
+                print("NEW REPORT")
+
+                ReportRepository.save_report_details(report_data)
+
+                print("REPORT INSERTED")
 
         except Exception as e:
             print("SAVE FAILED")
             print(type(e))
             print(str(e))
-            raise  # Bubbles up genuine context directly back to Flask runtime
-
+            raise
         return file_path
 
     @staticmethod
     def get_report_history():
         reports = ReportRepository.get_report_history()
         return reports
-    
+
     @staticmethod
     def get_latest_report(candidate_id):
         return ReportRepository.get_latest_report(candidate_id)

@@ -1,185 +1,92 @@
+from curses import error
+
 from flask import Blueprint
 from flask import request
 from flask import jsonify
+from services.ongrid.face_match_service import FaceMatchService
+from services.face_match_result_service import FaceMatchResultService
 
-
-from services.ongrid.face_match_service import (
-    FaceMatchService
-)
-
-from services.face_match_result_service import (
-    FaceMatchResultService
-)
-
-
-face_match_bp = Blueprint(
-
-    "face_match",
-
-    __name__
-
-)
+face_match_bp = Blueprint("face_match", __name__)
 
 
 # =====================================================
 # VERIFY FACE MATCH
 # =====================================================
 
-@face_match_bp.route(
 
-    "/face-match/verify",
-
-    methods=["POST"]
-
-)
-
+@face_match_bp.route("/face-match/verify", methods=["POST"])
 def verify_face_match():
 
     try:
+        data = request.get_json()
 
-        data = request.json
+        if not data:
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Request body is required",
+                }
+            ), 400
+        candidate_id = data.get("candidate_id")
 
+        bgv_id = data.get("bgv_id")
 
-        result = (
+        document_id = data.get("document_id")
 
-            FaceMatchService
+        if not candidate_id:
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "candidate_id is required",
+                }
+            ), 400
 
-            .verify_face(
+        if not bgv_id:
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "bgv_id is required",
+                }
+            ), 400
 
-                candidate_id=
-
-                data["candidate_id"],
-
-
-                bgv_id=
-
-                data["bgv_id"],
-
-
-                document_id=
-
-                data["document_id"]
-
-            )
-
+        if not document_id:
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "document_id is required",
+                }
+            ), 400
+        # result = FaceMatchService.verify_face(
+        #     candidate_id=data["candidate_id"],
+        #     bgv_id=data["bgv_id"],
+        #     document_id=data["document_id"],
+        # )
+        result = FaceMatchService.verify_face(
+            candidate_id=candidate_id,
+            bgv_id=bgv_id,
+            document_id=document_id,
         )
-
-
         return jsonify(
-
-            {
-
-                "status":
-
-                "success",
-
-
-                "message":
-
-                "Face match completed",
-
-
-                "data":
-
-                result
-
-            }
-
+            {"status": "success", "message": "Face match completed", "data": result}
         ), 200
 
-
     except Exception as e:
-
-
-        return jsonify(
-
-            {
-
-                "status":
-
-                "error",
-
-
-                "message":
-
-                str(e)
-
-            }
-
-        ), 400
-
-
+        print("FACE MATCH ERROR:", str(error))
+        return jsonify({"status": "error", "message": str(e)}), 400
 
 
 # =====================================================
 # GET FACE MATCH RESULT
 # =====================================================
 
-@face_match_bp.route(
 
-    "/face-match/result/<int:candidate_id>",
-
-    methods=["GET"]
-
-)
-
-def get_face_match_result(
-
-        candidate_id
-
-):
-
+@face_match_bp.route("/face-match/result/<int:candidate_id>", methods=["GET"])
+def get_face_match_result(candidate_id):
 
     try:
+        result = FaceMatchResultService.get_result(candidate_id)
 
-
-        result = (
-
-            FaceMatchResultService
-
-            .get_result(
-
-                candidate_id
-
-            )
-
-        )
-
-
-        return jsonify(
-
-            {
-
-                "status":
-
-                "success",
-
-
-                "data":
-
-                result
-
-            }
-
-        ), 200
-
+        return jsonify({"status": "success", "data": result}), 200
 
     except Exception as e:
-
-
-        return jsonify(
-
-            {
-
-                "status":
-
-                "error",
-
-
-                "message":
-
-                str(e)
-
-            }
-
-        ), 400
+        return jsonify({"status": "error", "message": str(e)}), 400

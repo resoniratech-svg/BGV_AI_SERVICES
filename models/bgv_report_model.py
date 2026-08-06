@@ -2,91 +2,28 @@ from db import db
 
 
 class BGVReport(db.Model):
-
     __tablename__ = "bgv_reports"
 
-    id = db.Column(
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
 
-        db.BigInteger,
+    candidate_id = db.Column(db.BigInteger, nullable=False)
 
-        primary_key=True,
+    report_reference_id = db.Column(db.String(100), unique=True, nullable=False)
 
-        autoincrement=True
-    )
+    report_name = db.Column(db.String(255), nullable=False)
 
-    candidate_id = db.Column(
+    report_type = db.Column(db.String(100), default="FULL_BGV")
 
-        db.BigInteger,
+    report_status = db.Column(db.String(50), default="COMPLETED")
 
-        nullable=False
-    )
+    verification_status = db.Column(db.String(50), default="VERIFIED")
 
-    report_reference_id = db.Column(
+    file_name = db.Column(db.String(255), nullable=False)
 
-        db.String(100),
+    file_path = db.Column(db.Text, nullable=False)
 
-        unique=True,
+    file_url = db.Column(db.Text)
 
-        nullable=False
-    )
+    storage_provider = db.Column(db.String(100), default="LOCAL_STORAGE")
 
-    report_name = db.Column(
-
-        db.String(255),
-
-        nullable=False
-    )
-
-    report_type = db.Column(
-
-        db.String(100),
-
-        default="FULL_BGV"
-    )
-
-    report_status = db.Column(
-
-        db.String(50),
-
-        default="COMPLETED"
-    )
-
-    verification_status = db.Column(
-
-        db.String(50),
-
-        default="VERIFIED"
-    )
-
-    file_name = db.Column(
-
-        db.String(255),
-
-        nullable=False
-    )
-
-    file_path = db.Column(
-
-        db.Text,
-
-        nullable=False
-    )
-
-    file_url = db.Column(
-
-        db.Text
-    )
-
-    storage_provider = db.Column(
-
-        db.String(100),
-
-        default="LOCAL_STORAGE"
-    )
-
-    created_at = db.Column(
-
-        db.DateTime,
-
-        server_default=db.func.now()
-    )
+    created_at = db.Column(db.DateTime, server_default=db.func.now())

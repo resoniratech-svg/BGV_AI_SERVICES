@@ -2,37 +2,21 @@ from db import get_connection
 
 
 class FaceMatchRepository:
-
-
-
     @staticmethod
     def save_result(
-
-            candidate_id,
-
-            bgv_id,
-
-            document_id,
-
-            confidence_score,
-
-            verification_status,
-
-            provider_name,
-
-            api_reference_id,
-
-            raw_response
-
+        candidate_id,
+        bgv_id,
+        document_id,
+        confidence_score,
+        verification_status,
+        provider_name,
+        api_reference_id,
+        raw_response,
     ):
-
-
 
         connection = get_connection()
 
         cursor = connection.cursor()
-
-
 
         query = """
 
@@ -86,78 +70,34 @@ class FaceMatchRepository:
 
         """
 
-
-
         cursor.execute(
-
-
             query,
-
-
             (
-
-
                 candidate_id,
-
                 bgv_id,
-
                 document_id,
-
-
                 confidence_score,
-
-
                 verification_status,
-
-
                 provider_name,
-
-
                 api_reference_id,
-
-
-                raw_response
-
-            )
-
+                raw_response,
+            ),
         )
-
-
 
         connection.commit()
 
-
-
         cursor.close()
-
 
         connection.close()
 
-
-
-
     @staticmethod
-    def get_result(
+    def get_result(candidate_id):
 
-            candidate_id
+        connection = get_connection()
 
-    ):
+        cursor = connection.cursor(dictionary=True)
 
-
-
-        connection=get_connection()
-
-
-
-        cursor=connection.cursor(
-
-            dictionary=True
-
-        )
-
-
-
-        query="""
+        query = """
 
 
         SELECT *
@@ -177,92 +117,50 @@ class FaceMatchRepository:
 
         """
 
+        cursor.execute(query, (candidate_id,))
 
-
-        cursor.execute(
-
-
-            query,
-
-
-            (
-
-                candidate_id,
-
-            )
-
-        )
-
-
-
-        result=cursor.fetchone()
-
-
+        result = cursor.fetchone()
 
         cursor.close()
 
         connection.close()
 
-
         return result
-    
+
     # ==========================================
+
+
 # GET FACE MATCH RESULT
 # ==========================================
 
-@staticmethod
-def get_result(
 
-        candidate_id
+# @staticmethod
+# def get_result(candidate_id):
 
-):
+#     connection = get_connection()
 
+#     cursor = connection.cursor(dictionary=True)
 
-    connection = get_connection()
+#     query = """
 
+#         SELECT *
 
-    cursor = connection.cursor(
+#         FROM face_match_results
 
-        dictionary=True
+#         WHERE candidate_id=%s
 
-    )
+#         ORDER BY id DESC
 
+#         LIMIT 1
 
-    query = """
+#     """
 
-        SELECT *
+#     cursor.execute(query, (candidate_id,))
 
-        FROM face_match_results
+#     result = cursor.fetchone()
 
-        WHERE candidate_id=%s
+#     cursor.close()
 
-        ORDER BY id DESC
+#     connection.close()
 
-        LIMIT 1
-
-    """
-
-
-    cursor.execute(
-
-        query,
-
-        (
-
-            candidate_id,
-
-        )
-
-    )
-
-
-    result = cursor.fetchone()
-
-
-    cursor.close()
-
-    connection.close()
-
-
-    return result
-
+#     return result
