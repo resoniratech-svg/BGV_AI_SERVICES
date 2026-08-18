@@ -2,7 +2,6 @@ from db import get_connection
 
 
 class BankStatementRepository:
-
     ###############################################################
     # GET UPLOADED BANK STATEMENT
     ###############################################################
@@ -35,7 +34,7 @@ class BankStatementRepository:
                 ORDER BY id DESC
                 LIMIT 1
                 """,
-                (candidate_id, bgv_id)
+                (candidate_id, bgv_id),
             )
             return cursor.fetchone()
         finally:
@@ -68,7 +67,7 @@ class BankStatementRepository:
                 ORDER BY id DESC
                 LIMIT 1
                 """,
-                (candidate_id, bgv_id)
+                (candidate_id, bgv_id),
             )
             return cursor.fetchone()
         finally:
@@ -90,7 +89,7 @@ class BankStatementRepository:
         provider_status_code,
         request_payload,
         response_payload,
-        completed_at=None
+        completed_at=None,
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -127,8 +126,8 @@ class BankStatementRepository:
                     provider_status_code,
                     request_payload,
                     response_payload,
-                    completed_at
-                )
+                    completed_at,
+                ),
             )
             connection.commit()
             return cursor.lastrowid
@@ -169,7 +168,7 @@ class BankStatementRepository:
                 WHERE transaction_id=%s
                 LIMIT 1
                 """,
-                (transaction_id,)
+                (transaction_id,),
             )
             return cursor.fetchone()
         finally:
@@ -192,7 +191,7 @@ class BankStatementRepository:
                 WHERE transaction_id=%s
                 LIMIT 1
                 """,
-                (transaction_id,)
+                (transaction_id,),
             )
             row = cursor.fetchone()
             if not row:
@@ -212,7 +211,7 @@ class BankStatementRepository:
         provider_status_code=None,
         response_payload=None,
         completed_at=None,
-        provider_request_id=None
+        provider_request_id=None,
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -236,8 +235,8 @@ class BankStatementRepository:
                     provider_status_code,
                     response_payload,
                     completed_at,
-                    transaction_id
-                )
+                    transaction_id,
+                ),
             )
             connection.commit()
             return cursor.rowcount
@@ -264,7 +263,7 @@ class BankStatementRepository:
         provider_excel_url,
         json_file_path,
         excel_file_path,
-        report_generated_at
+        report_generated_at,
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -303,8 +302,8 @@ class BankStatementRepository:
                     provider_excel_url,
                     json_file_path,
                     excel_file_path,
-                    report_generated_at
-                )
+                    report_generated_at,
+                ),
             )
             connection.commit()
             return cursor.lastrowid
@@ -331,7 +330,7 @@ class BankStatementRepository:
                 WHERE request_id=%s
                 LIMIT 1
                 """,
-                (request_id,)
+                (request_id,),
             )
             return cursor.fetchone() is not None
         finally:
@@ -352,7 +351,7 @@ class BankStatementRepository:
                 DELETE FROM bank_statement_results
                 WHERE request_id=%s
                 """,
-                (request_id,)
+                (request_id,),
             )
             connection.commit()
             return cursor.rowcount
@@ -376,7 +375,7 @@ class BankStatementRepository:
         provider_excel_url,
         json_file_path,
         excel_file_path,
-        report_generated_at
+        report_generated_at,
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -406,8 +405,8 @@ class BankStatementRepository:
                     json_file_path,
                     excel_file_path,
                     report_generated_at,
-                    request_id
-                )
+                    request_id,
+                ),
             )
             connection.commit()
             return cursor.rowcount
@@ -451,7 +450,7 @@ class BankStatementRepository:
                 ORDER BY id DESC
                 LIMIT 1
                 """,
-                (candidate_id, bgv_id)
+                (candidate_id, bgv_id),
             )
             return cursor.fetchone()
         finally:

@@ -4,10 +4,8 @@ from db import get_connection
 
 
 class CourtRecordRepository:
-
     @staticmethod
     def save_court_record_result(
-
         candidate_id,
         verification_id,
         full_name,
@@ -20,7 +18,7 @@ class CourtRecordRepository:
         judgment_date,
         risk_level,
         provider_name,
-        raw_response
+        raw_response,
     ):
 
         connection = get_connection()
@@ -65,7 +63,6 @@ class CourtRecordRepository:
         """
 
         values = (
-
             candidate_id,
             verification_id,
             full_name,
@@ -78,14 +75,10 @@ class CourtRecordRepository:
             judgment_date,
             risk_level,
             provider_name,
-            json.dumps(raw_response)
+            json.dumps(raw_response),
         )
 
-        cursor.execute(
-
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
@@ -95,12 +88,7 @@ class CourtRecordRepository:
 
     @staticmethod
     def save_court_record_log(
-
-        candidate_id,
-        request_url,
-        request_headers,
-        response_data,
-        status_code
+        candidate_id, request_url, request_headers, response_data, status_code
     ):
 
         connection = get_connection()
@@ -134,14 +122,9 @@ class CourtRecordRepository:
             )
         """
 
-        payload = {
-
-            "candidate_id": candidate_id,
-            "headers": request_headers
-        }
+        payload = {"candidate_id": candidate_id, "headers": request_headers}
 
         values = (
-
             "COURT_RECORD_VERIFICATION",
             "Indian Kanoon",
             request_url,
@@ -149,14 +132,10 @@ class CourtRecordRepository:
             json.dumps(response_data),
             status_code,
             "SUCCESS",
-            "Court Record Search"
+            "Court Record Search",
         )
 
-        cursor.execute(
-
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 

@@ -2,28 +2,25 @@ from db import get_connection
 
 
 class ConsentRepository:
-
     ###############################################################
     # SAVE CANDIDATE CONSENT
     ###############################################################
 
     @staticmethod
     def save_candidate_consent(
-
-            candidate_id,
-            bgv_id,
-            verification_type,
-            consent_status,
-            consent_text,
-            consent_version,
-            consent_source,
-            consent_given_at,
-            ip_address,
-            user_agent,
-            provider_name,
-            api_reference_id,
-            raw_response
-
+        candidate_id,
+        bgv_id,
+        verification_type,
+        consent_status,
+        consent_text,
+        consent_version,
+        consent_source,
+        consent_given_at,
+        ip_address,
+        user_agent,
+        provider_name,
+        api_reference_id,
+        raw_response,
     ):
 
         connection = get_connection()
@@ -79,8 +76,8 @@ class ConsentRepository:
                 user_agent,
                 provider_name,
                 api_reference_id,
-                raw_response
-            )
+                raw_response,
+            ),
         )
 
         connection.commit()
@@ -98,19 +95,11 @@ class ConsentRepository:
     ###############################################################
 
     @staticmethod
-    def get_candidate_consent(
-
-            candidate_id,
-            bgv_id,
-            verification_type
-
-    ):
+    def get_candidate_consent(candidate_id, bgv_id, verification_type):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -122,11 +111,7 @@ class ConsentRepository:
             ORDER BY id DESC
             LIMIT 1
             """,
-            (
-                candidate_id,
-                bgv_id,
-                verification_type
-            )
+            (candidate_id, bgv_id, verification_type),
         )
 
         result = cursor.fetchone()
@@ -143,16 +128,14 @@ class ConsentRepository:
 
     @staticmethod
     def update_candidate_consent(
-
-            consent_id,
-            consent_status,
-            consent_given_at,
-            ip_address,
-            user_agent,
-            provider_name,
-            api_reference_id,
-            raw_response
-
+        consent_id,
+        consent_status,
+        consent_given_at,
+        ip_address,
+        user_agent,
+        provider_name,
+        api_reference_id,
+        raw_response,
     ):
 
         connection = get_connection()
@@ -180,8 +163,8 @@ class ConsentRepository:
                 provider_name,
                 api_reference_id,
                 raw_response,
-                consent_id
-            )
+                consent_id,
+            ),
         )
 
         connection.commit()
@@ -195,11 +178,7 @@ class ConsentRepository:
     ###############################################################
 
     @staticmethod
-    def expire_candidate_consent(
-
-            consent_id
-
-    ):
+    def expire_candidate_consent(consent_id):
 
         connection = get_connection()
 
@@ -212,9 +191,7 @@ class ConsentRepository:
                 consent_status='EXPIRED'
             WHERE id=%s
             """,
-            (
-                consent_id,
-            )
+            (consent_id,),
         )
 
         connection.commit()
@@ -224,26 +201,25 @@ class ConsentRepository:
         connection.close()
 
         ####################################################
+
     # UPDATE CANDIDATE CONSENT
     ####################################################
 
     @staticmethod
     def update_candidate_consent(
-
-            candidate_id,
-            bgv_id,
-            verification_type,
-            consent_status,
-            consent_text,
-            consent_version,
-            consent_source,
-            consent_given_at,
-            ip_address,
-            user_agent,
-            provider_name=None,
-            api_reference_id=None,
-            raw_response=None
-
+        candidate_id,
+        bgv_id,
+        verification_type,
+        consent_status,
+        consent_text,
+        consent_version,
+        consent_source,
+        consent_given_at,
+        ip_address,
+        user_agent,
+        provider_name=None,
+        api_reference_id=None,
+        raw_response=None,
     ):
 
         connection = get_connection()
@@ -291,34 +267,20 @@ class ConsentRepository:
                 verification_type=%s
             """,
             (
-
                 consent_status,
-
                 consent_text,
-
                 consent_version,
-
                 consent_source,
-
                 consent_given_at,
-
                 ip_address,
-
                 user_agent,
-
                 provider_name,
-
                 api_reference_id,
-
                 raw_response,
-
                 candidate_id,
-
                 bgv_id,
-
-                verification_type
-
-            )
+                verification_type,
+            ),
         )
 
         connection.commit()

@@ -5,7 +5,6 @@ from services.ongrid.bank_statement_download_service import BankStatementDownloa
 
 
 class BankStatementFetchService:
-
     ####################################################
     # FETCH REPORT
     ####################################################
@@ -32,9 +31,7 @@ class BankStatementFetchService:
         ####################################################
         # REQUEST DETAILS
         ####################################################
-        request = BankStatementRepository.get_request_by_transaction_id(
-            transaction_id
-        )
+        request = BankStatementRepository.get_request_by_transaction_id(transaction_id)
 
         ####################################################
         # REQUEST EXISTS
@@ -66,15 +63,13 @@ class BankStatementFetchService:
 
             return {
                 "success": True,
-                "message": "Bank Statement report already processed."
+                "message": "Bank Statement report already processed.",
             }
 
         ####################################################
         # REQUEST HEADERS
         ####################################################
-        headers = {
-            "X-Transaction-ID": transaction_id
-        }
+        headers = {"X-Transaction-ID": transaction_id}
 
         ####################################################
         # REQUEST LOG
@@ -88,8 +83,7 @@ class BankStatementFetchService:
         # FETCH REPORT API
         ####################################################
         response = OnGridClient.get(
-            "/bank-api/bank-statement-analyzer/fetch-report",
-            headers=headers
+            "/bank-api/bank-statement-analyzer/fetch-report", headers=headers
         )
 
         ####################################################
@@ -146,13 +140,12 @@ class BankStatementFetchService:
         # REPORT STILL PROCESSING
         ####################################################
         if provider_status_code == "1021":
-            
             # UPDATE REQUEST STATUS
             BankStatementRepository.update_request_status(
                 transaction_id=transaction_id,
                 request_status="PROCESSING",
                 provider_status_code=provider_status_code,
-                response_payload=json.dumps(response, default=str)
+                response_payload=json.dumps(response, default=str),
             )
 
             # PROCESSING LOG
@@ -169,7 +162,7 @@ class BankStatementFetchService:
                 "success": True,
                 "request_status": "PROCESSING",
                 "provider_status_code": provider_status_code,
-                "message": provider_message
+                "message": provider_message,
             }
 
         ####################################################
@@ -198,7 +191,9 @@ class BankStatementFetchService:
         # REPORT VALIDATION
         ####################################################
         if not json_link and not excel_link:
-            raise Exception("Gridlines returned report completed but no report links were found.")
+            raise Exception(
+                "Gridlines returned report completed but no report links were found."
+            )
 
         # REPORT LINKS LOG
         print("=" * 80)
@@ -215,7 +210,7 @@ class BankStatementFetchService:
             bgv_id=request["bgv_id"],
             transaction_id=transaction_id,
             request_id=request["id"],
-            fetch_response=response
+            fetch_response=response,
         )
 
         # DOWNLOAD LOG

@@ -5,23 +5,22 @@ from db import get_connection
 
 
 class CreditBureauRepository:
-
     ###############################################################
     # MAIN RESULT
     ###############################################################
 
     @staticmethod
     def save_credit_bureau_result(
-            candidate_id,
-            bgv_id,
-            request_id,
-            transaction_id,
-            verification_status,
-            response_code,
-            response_message,
-            provider_name,
-            api_reference_id,
-            raw_response
+        candidate_id,
+        bgv_id,
+        request_id,
+        transaction_id,
+        verification_status,
+        response_code,
+        response_message,
+        provider_name,
+        api_reference_id,
+        raw_response,
     ):
 
         connection = get_connection()
@@ -57,8 +56,8 @@ class CreditBureauRepository:
                 response_message,
                 provider_name,
                 api_reference_id,
-                json.dumps(raw_response, default=str)  # Safely handles dates/decimals
-            )
+                json.dumps(raw_response, default=str),  # Safely handles dates/decimals
+            ),
         )
 
         connection.commit()
@@ -76,19 +75,19 @@ class CreditBureauRepository:
 
     @staticmethod
     def save_personal_information(
-            credit_bureau_result_id,
-            full_name,
-            first_name,
-            last_name,
-            gender,
-            age,
-            date_of_birth,
-            pan_number,
-            aadhaar_number,
-            passport_number,
-            driving_license_number,
-            voter_id,
-            ration_card_number
+        credit_bureau_result_id,
+        full_name,
+        first_name,
+        last_name,
+        gender,
+        age,
+        date_of_birth,
+        pan_number,
+        aadhaar_number,
+        passport_number,
+        driving_license_number,
+        voter_id,
+        ration_card_number,
     ):
 
         connection = get_connection()
@@ -130,8 +129,8 @@ class CreditBureauRepository:
                 passport_number,
                 driving_license_number,
                 voter_id,
-                ration_card_number
-            )
+                ration_card_number,
+            ),
         )
 
         connection.commit()
@@ -145,14 +144,14 @@ class CreditBureauRepository:
 
     @staticmethod
     def save_contact_information(
-            credit_bureau_result_id,
-            contact_type,
-            value,
-            state,
-            pincode,
-            address_type,
-            reported_date,
-            serial_number
+        credit_bureau_result_id,
+        contact_type,
+        value,
+        state,
+        pincode,
+        address_type,
+        reported_date,
+        serial_number,
     ):
 
         connection = get_connection()
@@ -184,8 +183,8 @@ class CreditBureauRepository:
                 pincode,
                 address_type,
                 reported_date,
-                serial_number
-            )
+                serial_number,
+            ),
         )
 
         connection.commit()
@@ -199,19 +198,19 @@ class CreditBureauRepository:
 
     @staticmethod
     def save_credit_account(
-            credit_bureau_result_id,
-            account_number,
-            institution,
-            account_type,
-            ownership_type,
-            balance,
-            past_due_amount,
-            open_status,
-            account_status,
-            date_opened,
-            date_reported,
-            source,
-            raw_account_response
+        credit_bureau_result_id,
+        account_number,
+        institution,
+        account_type,
+        ownership_type,
+        balance,
+        past_due_amount,
+        open_status,
+        account_status,
+        date_opened,
+        date_reported,
+        source,
+        raw_account_response,
     ):
 
         connection = get_connection()
@@ -253,8 +252,10 @@ class CreditBureauRepository:
                 date_opened,
                 date_reported,
                 source,
-                json.dumps(raw_account_response, default=str)  # Safely handles dates/decimals
-            )
+                json.dumps(
+                    raw_account_response, default=str
+                ),  # Safely handles dates/decimals
+            ),
         )
 
         connection.commit()
@@ -268,25 +269,25 @@ class CreditBureauRepository:
 
     @staticmethod
     def save_summary(
-            credit_bureau_result_id,
-            credit_score,
-            score_name,
-            score_version,
-            total_accounts,
-            active_accounts,
-            write_off_accounts,
-            past_due_accounts,
-            zero_balance_accounts,
-            total_balance,
-            total_credit_limit,
-            total_sanction_amount,
-            highest_credit,
-            highest_balance,
-            average_open_balance,
-            total_monthly_payment,
-            oldest_account,
-            recent_account,
-            total_past_due
+        credit_bureau_result_id,
+        credit_score,
+        score_name,
+        score_version,
+        total_accounts,
+        active_accounts,
+        write_off_accounts,
+        past_due_accounts,
+        zero_balance_accounts,
+        total_balance,
+        total_credit_limit,
+        total_sanction_amount,
+        highest_credit,
+        highest_balance,
+        average_open_balance,
+        total_monthly_payment,
+        oldest_account,
+        recent_account,
+        total_past_due,
     ):
 
         connection = get_connection()
@@ -340,8 +341,8 @@ class CreditBureauRepository:
                 total_monthly_payment,
                 oldest_account,
                 recent_account,
-                total_past_due
-            )
+                total_past_due,
+            ),
         )
 
         connection.commit()
@@ -355,10 +356,7 @@ class CreditBureauRepository:
 
     @staticmethod
     def save_score_factor(
-            credit_bureau_result_id,
-            factor_type,
-            factor_code,
-            description
+        credit_bureau_result_id, factor_type, factor_code, description
     ):
 
         connection = get_connection()
@@ -378,12 +376,7 @@ class CreditBureauRepository:
                 %s,%s,%s,%s
             )
             """,
-            (
-                credit_bureau_result_id,
-                factor_type,
-                factor_code,
-                description
-            )
+            (credit_bureau_result_id, factor_type, factor_code, description),
         )
 
         connection.commit()
@@ -396,15 +389,11 @@ class CreditBureauRepository:
     ####################################################
 
     @staticmethod
-    def get_credit_bureau_result(
-            candidate_id
-    ):
+    def get_credit_bureau_result(candidate_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -414,7 +403,7 @@ class CreditBureauRepository:
             ORDER BY id DESC
             LIMIT 1
             """,
-            (candidate_id,)
+            (candidate_id,),
         )
 
         result = cursor.fetchone()
@@ -429,15 +418,11 @@ class CreditBureauRepository:
     ####################################################
 
     @staticmethod
-    def get_personal_information(
-            credit_bureau_result_id
-    ):
+    def get_personal_information(credit_bureau_result_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -446,7 +431,7 @@ class CreditBureauRepository:
             WHERE credit_bureau_result_id=%s
             LIMIT 1
             """,
-            (credit_bureau_result_id,)
+            (credit_bureau_result_id,),
         )
 
         result = cursor.fetchone()
@@ -461,15 +446,11 @@ class CreditBureauRepository:
     ####################################################
 
     @staticmethod
-    def get_contact_information(
-            credit_bureau_result_id
-    ):
+    def get_contact_information(credit_bureau_result_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -477,7 +458,7 @@ class CreditBureauRepository:
             FROM credit_bureau_contact_information
             WHERE credit_bureau_result_id=%s
             """,
-            (credit_bureau_result_id,)
+            (credit_bureau_result_id,),
         )
 
         result = cursor.fetchall()
@@ -492,15 +473,11 @@ class CreditBureauRepository:
     ####################################################
 
     @staticmethod
-    def get_credit_accounts(
-            credit_bureau_result_id
-    ):
+    def get_credit_accounts(credit_bureau_result_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -509,7 +486,7 @@ class CreditBureauRepository:
             WHERE credit_bureau_result_id=%s
             ORDER BY id
             """,
-            (credit_bureau_result_id,)
+            (credit_bureau_result_id,),
         )
 
         result = cursor.fetchall()
@@ -524,15 +501,11 @@ class CreditBureauRepository:
     ####################################################
 
     @staticmethod
-    def get_summary(
-            credit_bureau_result_id
-    ):
+    def get_summary(credit_bureau_result_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -541,7 +514,7 @@ class CreditBureauRepository:
             WHERE credit_bureau_result_id=%s
             LIMIT 1
             """,
-            (credit_bureau_result_id,)
+            (credit_bureau_result_id,),
         )
 
         result = cursor.fetchone()
@@ -556,15 +529,11 @@ class CreditBureauRepository:
     ####################################################
 
     @staticmethod
-    def get_score_factors(
-            credit_bureau_result_id
-    ):
+    def get_score_factors(credit_bureau_result_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -573,7 +542,7 @@ class CreditBureauRepository:
             WHERE credit_bureau_result_id=%s
             ORDER BY id
             """,
-            (credit_bureau_result_id,)
+            (credit_bureau_result_id,),
         )
 
         result = cursor.fetchall()

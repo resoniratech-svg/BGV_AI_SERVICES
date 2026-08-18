@@ -2,7 +2,6 @@ from db import get_connection
 
 
 class AadhaarRepository:
-
     # ==========================================
     # SAVE AADHAAR SESSION
     # ==========================================
@@ -17,7 +16,7 @@ class AadhaarRepository:
         session_status,
         provider_name,
         api_reference_id,
-        raw_response
+        raw_response,
     ):
 
         connection = get_connection()
@@ -57,7 +56,6 @@ class AadhaarRepository:
         """
 
         values = (
-
             candidate_id,
             bgv_id,
             transaction_id,
@@ -66,20 +64,14 @@ class AadhaarRepository:
             session_status,
             provider_name,
             api_reference_id,
-            raw_response
-
+            raw_response,
         )
 
-        cursor.execute(
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
-        aadhaar_session_id = (
-            cursor.lastrowid
-        )
+        aadhaar_session_id = cursor.lastrowid
 
         cursor.close()
 
@@ -92,15 +84,11 @@ class AadhaarRepository:
     # ==========================================
 
     @staticmethod
-    def get_aadhaar_session(
-        candidate_id
-    ):
+    def get_aadhaar_session(candidate_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         query = """
 
@@ -116,15 +104,7 @@ class AadhaarRepository:
 
         """
 
-        cursor.execute(
-
-            query,
-
-            (
-                candidate_id,
-            )
-
-        )
+        cursor.execute(query, (candidate_id,))
 
         result = cursor.fetchone()
 
@@ -139,17 +119,11 @@ class AadhaarRepository:
     # ==========================================
 
     @staticmethod
-    def get_aadhaar_session_by_transaction_id(
-
-        transaction_id
-
-    ):
+    def get_aadhaar_session_by_transaction_id(transaction_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         query = """
 
@@ -163,15 +137,7 @@ class AadhaarRepository:
 
         """
 
-        cursor.execute(
-
-            query,
-
-            (
-                transaction_id,
-            )
-
-        )
+        cursor.execute(query, (transaction_id,))
 
         result = cursor.fetchone()
 
@@ -186,13 +152,7 @@ class AadhaarRepository:
     # ==========================================
 
     @staticmethod
-    def update_session_status(
-
-        transaction_id,
-        session_status,
-        raw_response=None
-
-    ):
+    def update_session_status(transaction_id, session_status, raw_response=None):
 
         connection = get_connection()
 
@@ -212,17 +172,7 @@ class AadhaarRepository:
 
         """
 
-        cursor.execute(
-
-            query,
-
-            (
-                session_status,
-                raw_response,
-                transaction_id
-            )
-
-        )
+        cursor.execute(query, (session_status, raw_response, transaction_id))
 
         connection.commit()
 
@@ -230,46 +180,132 @@ class AadhaarRepository:
 
         connection.close()
 
-    
-
     # ==========================================
     # SAVE FINAL VERIFICATION RESULT
     # ==========================================
 
     @staticmethod
     def save_aadhaar_verification_result(
-
         candidate_id,
-
         bgv_id,
-
         verification_status,
-
         resident_name,
-
         date_of_birth,
-
         gender,
-
         address,
-
         resident_image,
-
         provider_name,
-
         api_reference_id,
-
-        raw_response
-):
-
+        raw_response,
+    ):
         connection = get_connection()
-
         cursor = connection.cursor()
 
-        query = """
+        try:
+            # ==================================================
+            # CHECK EXISTING RESULT
+            # ==================================================
 
-            INSERT INTO aadhaar_verification_results (
+            check_query = """
+                SELECT id
+                FROM aadhaar_verification_results
+                WHERE candidate_id = %s
+                AND bgv_id = %s
+                ORDER BY id DESC
+                LIMIT 1
+            """
 
+            cursor.execute(
+                check_query,
+                (
+                    candidate_id,
+                    bgv_id,
+                ),
+            )
+
+            existing_result = cursor.fetchone()
+
+            # ==================================================
+            # UPDATE EXISTING RESULT
+            # ==================================================
+
+            if existing_result:
+                verification_result_id = existing_result[0]
+
+                update_query = """
+                    UPDATE aadhaar_verification_results
+                    SET
+                        verification_status = %s,
+                        resident_name = %s,
+                        date_of_birth = %s,
+                        gender = %s,
+                        address = %s,
+                        resident_image = %s,
+                        provider_name = %s,
+                        api_reference_id = %s,
+                        raw_response = %s,
+                        verified_at = CURRENT_TIMESTAMP
+                    WHERE id = %s
+                """
+
+                values = (
+                    verification_status,
+                    resident_name,
+                    date_of_birth,
+                    gender,
+                    address,
+                    resident_image,
+                    provider_name,
+                    api_reference_id,
+                    raw_response,
+                    verification_result_id,
+                )
+
+                cursor.execute(update_query, values)
+
+                connection.commit()
+
+                print("=" * 80)
+                print("AADHAAR RESULT UPDATED")
+                print("RESULT ID:", verification_result_id)
+                print("=" * 80)
+
+                return verification_result_id
+
+            # ==================================================
+            # INSERT NEW RESULT
+            # ==================================================
+
+            insert_query = """
+                INSERT INTO aadhaar_verification_results (
+                    candidate_id,
+                    bgv_id,
+                    verification_status,
+                    resident_name,
+                    date_of_birth,
+                    gender,
+                    address,
+                    resident_image,
+                    provider_name,
+                    api_reference_id,
+                    raw_response
+                )
+                VALUES (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
+            """
+
+            values = (
                 candidate_id,
                 bgv_id,
                 verification_status,
@@ -280,108 +316,56 @@ class AadhaarRepository:
                 resident_image,
                 provider_name,
                 api_reference_id,
-                raw_response
-
+                raw_response,
             )
 
-            VALUES (
+            cursor.execute(insert_query, values)
 
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s,
-                %s
-                
-                
+            connection.commit()
 
-            )
+            verification_result_id = cursor.lastrowid
 
-        """
+            print("=" * 80)
+            print("AADHAAR RESULT INSERTED")
+            print("RESULT ID:", verification_result_id)
+            print("=" * 80)
 
-        values = (
+            return verification_result_id
 
-            candidate_id,
-            bgv_id,
-            verification_status,
-            resident_name,
-            date_of_birth,
-            gender,
-            address,
-            resident_image,
-            provider_name,
-            api_reference_id,
-            raw_response
+        except Exception:
+            connection.rollback()
+            raise
 
-        )
-
-        cursor.execute(
-            query,
-            values
-        )
-
-        connection.commit()
-
-        verification_result_id = (
-            cursor.lastrowid
-        )
-
-        cursor.close()
-
-        connection.close()
-
-        return verification_result_id
+        finally:
+            cursor.close()
+            connection.close()
 
     # ==========================================
+
     # GET VERIFICATION RESULT
     # ==========================================
 
     @staticmethod
-    def get_aadhaar_verification_result(
-
-        candidate_id
-
-    ):
+    def get_aadhaar_verification_result(candidate_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         query = """
-
             SELECT *
-
             FROM aadhaar_verification_results
-
             WHERE candidate_id = %s
-
+            AND resident_image IS NOT NULL
             ORDER BY id DESC
-
             LIMIT 1
-
         """
 
-        cursor.execute(
-
-            query,
-
-            (
-                candidate_id,
-            )
-
-        )
+        cursor.execute(query, (candidate_id,))
 
         result = cursor.fetchone()
 
         cursor.close()
-
         connection.close()
 
         return result

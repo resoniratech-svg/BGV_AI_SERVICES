@@ -1,30 +1,17 @@
 import json
 
-from services.ongrid.ongrid_client import (
-    OnGridClient
-)
+from services.ongrid.ongrid_client import OnGridClient
 
 
 class SalarySlipService:
-
     @staticmethod
-    def salary_slip_ocr(
-
-            base64_data
-
-    ):
+    def salary_slip_ocr(base64_data):
 
         ####################################################
         # GRIDLINES PAYLOAD
         ####################################################
 
-        payload = {
-
-            "base64_data": base64_data,
-
-            "consent": "Y"
-
-        }
+        payload = {"base64_data": base64_data, "consent": "Y"}
 
         print("=" * 80)
         print("SALARY SLIP OCR REQUEST")
@@ -35,17 +22,7 @@ class SalarySlipService:
         # GRIDLINES API
         ####################################################
 
-        response = (
-
-            OnGridClient.post(
-
-                "/bank-api/salary-slip/ocr",
-
-                payload
-
-            )
-
-        )
+        response = OnGridClient.post("/bank-api/salary-slip/ocr", payload)
 
         print("=" * 80)
         print("SALARY SLIP OCR RESPONSE")
@@ -57,11 +34,8 @@ class SalarySlipService:
         ####################################################
 
         if not response:
-
             raise Exception(
-
                 "Empty response received from Gridlines Salary Slip OCR API."
-
             )
 
         ####################################################
@@ -69,47 +43,32 @@ class SalarySlipService:
         ####################################################
 
         if response.get("success") is False:
-
             status = response.get("status")
 
             raw_response = response.get("raw_response")
 
             if status == 429:
-
                 raise Exception(
-
                     "Gridlines API rate limit exceeded. Please try again later."
-
                 )
 
             if status == 403:
-
                 raise Exception(
-
                     "Gridlines API access forbidden. Please verify API credentials."
-
                 )
 
             if status == 400:
-
                 raise Exception(
-
                     f"Invalid Salary Slip. Gridlines Response: {raw_response}"
-
                 )
 
             if status == 404:
-
                 raise Exception(
-
                     f"Gridlines endpoint not found. Response: {raw_response}"
-
                 )
 
             raise Exception(
-
                 f"Gridlines Salary Slip OCR failed. Status: {status}. Response: {raw_response}"
-
             )
 
         ####################################################
@@ -117,11 +76,8 @@ class SalarySlipService:
         ####################################################
 
         if response.get("status") != 200:
-
             raise Exception(
-
                 f"Unexpected Gridlines response status: {response.get('status')}"
-
             )
 
         ####################################################

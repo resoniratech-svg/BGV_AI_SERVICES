@@ -2,36 +2,33 @@ from db import get_connection
 
 
 class SalarySlipRepository:
-
     ###############################################################
     # SAVE SALARY SLIP OCR RESULT
     ###############################################################
 
     @staticmethod
     def save_salary_slip_ocr_result(
-
-            candidate_id,
-            bgv_id,
-            document_id,
-            employee_name,
-            employee_id,
-            pan_number,
-            uan_number,
-            bank_account_number,
-            pf_number,
-            grade,
-            designation,
-            company_business_name,
-            office_state,
-            office_address,
-            joining_date,
-            payslip_date,
-            pf_amount,
-            net_pay,
-            provider_name,
-            api_reference_id,
-            raw_response
-
+        candidate_id,
+        bgv_id,
+        document_id,
+        employee_name,
+        employee_id,
+        pan_number,
+        uan_number,
+        bank_account_number,
+        pf_number,
+        grade,
+        designation,
+        company_business_name,
+        office_state,
+        office_address,
+        joining_date,
+        payslip_date,
+        pf_amount,
+        net_pay,
+        provider_name,
+        api_reference_id,
+        raw_response,
     ):
 
         connection = get_connection()
@@ -97,7 +94,6 @@ class SalarySlipRepository:
         """
 
         values = (
-
             candidate_id,
             bgv_id,
             document_id,
@@ -118,14 +114,10 @@ class SalarySlipRepository:
             net_pay,
             provider_name,
             api_reference_id,
-            raw_response
-
+            raw_response,
         )
 
-        cursor.execute(
-            query,
-            values
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
@@ -142,17 +134,11 @@ class SalarySlipRepository:
     ###############################################################
 
     @staticmethod
-    def get_salary_slip_ocr_result(
-
-            candidate_id
-
-    ):
+    def get_salary_slip_ocr_result(candidate_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-            dictionary=True
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
             """
@@ -168,9 +154,7 @@ class SalarySlipRepository:
             LIMIT 1
 
             """,
-            (
-                candidate_id,
-            )
+            (candidate_id,),
         )
 
         result = cursor.fetchone()
@@ -187,27 +171,25 @@ class SalarySlipRepository:
 
     @staticmethod
     def update_salary_slip_ocr_result(
-
-            result_id,
-            employee_name,
-            employee_id,
-            pan_number,
-            uan_number,
-            bank_account_number,
-            pf_number,
-            grade,
-            designation,
-            company_business_name,
-            office_state,
-            office_address,
-            joining_date,
-            payslip_date,
-            pf_amount,
-            net_pay,
-            provider_name,
-            api_reference_id,
-            raw_response
-
+        result_id,
+        employee_name,
+        employee_id,
+        pan_number,
+        uan_number,
+        bank_account_number,
+        pf_number,
+        grade,
+        designation,
+        company_business_name,
+        office_state,
+        office_address,
+        joining_date,
+        payslip_date,
+        pf_amount,
+        net_pay,
+        provider_name,
+        api_reference_id,
+        raw_response,
     ):
 
         connection = get_connection()
@@ -245,7 +227,6 @@ class SalarySlipRepository:
 
             """,
             (
-
                 employee_name,
                 employee_id,
                 pan_number,
@@ -264,9 +245,8 @@ class SalarySlipRepository:
                 provider_name,
                 api_reference_id,
                 raw_response,
-                result_id
-
-            )
+                result_id,
+            ),
         )
 
         connection.commit()

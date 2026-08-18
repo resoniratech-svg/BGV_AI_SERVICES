@@ -2,7 +2,6 @@ from db import get_connection
 
 
 class EmploymentRepository:
-
     ###############################################################
     # SAVE EMPLOYMENT REQUEST
     ###############################################################
@@ -18,7 +17,7 @@ class EmploymentRepository:
         api_reference_id,
         raw_response,
         requested_at,
-        completed_at=None
+        completed_at=None,
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -58,8 +57,8 @@ class EmploymentRepository:
                     api_reference_id,
                     raw_response,
                     requested_at,
-                    completed_at
-                )
+                    completed_at,
+                ),
             )
             connection.commit()
             return cursor.lastrowid
@@ -86,7 +85,7 @@ class EmploymentRepository:
                 WHERE transaction_id=%s
                 LIMIT 1
                 """,
-                (transaction_id,)
+                (transaction_id,),
             )
             return cursor.fetchone()
         finally:
@@ -98,10 +97,7 @@ class EmploymentRepository:
     ###############################################################
     @staticmethod
     def update_request_status(
-        transaction_id,
-        verification_status,
-        raw_response=None,
-        completed_at=None
+        transaction_id, verification_status, raw_response=None, completed_at=None
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -117,12 +113,7 @@ class EmploymentRepository:
                     updated_at=NOW()
                 WHERE transaction_id=%s
                 """,
-                (
-                    verification_status,
-                    raw_response,
-                    completed_at,
-                    transaction_id
-                )
+                (verification_status, raw_response, completed_at, transaction_id),
             )
             connection.commit()
         except Exception:
@@ -157,7 +148,7 @@ class EmploymentRepository:
         transaction_id,
         api_reference_id,
         raw_response,
-        verified_at
+        verified_at,
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -218,8 +209,8 @@ class EmploymentRepository:
                     transaction_id,
                     api_reference_id,
                     raw_response,
-                    verified_at
-                )
+                    verified_at,
+                ),
             )
             connection.commit()
             return cursor.lastrowid
@@ -246,7 +237,7 @@ class EmploymentRepository:
                 WHERE employment_request_id=%s
                 LIMIT 1
                 """,
-                (employment_request_id,)
+                (employment_request_id,),
             )
             result = cursor.fetchone()
             return result is not None
@@ -271,7 +262,7 @@ class EmploymentRepository:
                 WHERE employment_request_id=%s
                 LIMIT 1
                 """,
-                (employment_request_id,)
+                (employment_request_id,),
             )
             result = cursor.fetchone()
 
@@ -284,7 +275,7 @@ class EmploymentRepository:
                     DELETE FROM employment_history_results
                     WHERE employment_result_id=%s
                     """,
-                    (employment_result_id,)
+                    (employment_result_id,),
                 )
 
                 # 3. DELETE EMPLOYER DETAILS
@@ -293,7 +284,7 @@ class EmploymentRepository:
                     DELETE FROM employment_employer_details
                     WHERE employment_result_id=%s
                     """,
-                    (employment_result_id,)
+                    (employment_result_id,),
                 )
 
                 # 4. DELETE RESULT
@@ -302,7 +293,7 @@ class EmploymentRepository:
                     DELETE FROM employment_results
                     WHERE id=%s
                     """,
-                    (employment_result_id,)
+                    (employment_result_id,),
                 )
 
             connection.commit()
@@ -330,7 +321,7 @@ class EmploymentRepository:
                 ORDER BY id DESC
                 LIMIT 1
                 """,
-                (candidate_id,)
+                (candidate_id,),
             )
             return cursor.fetchone()
         finally:
@@ -351,7 +342,7 @@ class EmploymentRepository:
         exit_date,
         guardian_name,
         name_match_score,
-        raw_history
+        raw_history,
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -389,8 +380,8 @@ class EmploymentRepository:
                     exit_date,
                     guardian_name,
                     name_match_score,
-                    raw_history
-                )
+                    raw_history,
+                ),
             )
             connection.commit()
             return cursor.lastrowid
@@ -417,7 +408,7 @@ class EmploymentRepository:
                 WHERE employment_result_id=%s
                 ORDER BY joining_date ASC, id ASC
                 """,
-                (employment_result_id,)
+                (employment_result_id,),
             )
             return cursor.fetchall()
         finally:
@@ -452,7 +443,7 @@ class EmploymentRepository:
         transaction_id,
         api_reference_id,
         raw_response,
-        verified_at
+        verified_at,
     ):
         connection = get_connection()
         cursor = connection.cursor()
@@ -520,8 +511,8 @@ class EmploymentRepository:
                     transaction_id,
                     api_reference_id,
                     raw_response,
-                    verified_at
-                )
+                    verified_at,
+                ),
             )
             connection.commit()
             return cursor.lastrowid
@@ -548,7 +539,7 @@ class EmploymentRepository:
                 WHERE employment_result_id=%s
                 LIMIT 1
                 """,
-                (employment_result_id,)
+                (employment_result_id,),
             )
             return cursor.fetchone()
         finally:

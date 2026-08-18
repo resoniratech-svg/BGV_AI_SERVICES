@@ -116,7 +116,7 @@ class FaceMatchService:
             verification_type="FACE_MATCH",
         )
         return {
-            "success": verification_status == "VERIFIED",
+            "success": verification_status == "MATCH",
             "verification_status": verification_status,
             "confidence_score": confidence,
             "provider_name": "GRIDLINES",

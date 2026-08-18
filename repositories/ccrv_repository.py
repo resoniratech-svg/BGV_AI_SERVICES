@@ -4,7 +4,6 @@ from db import get_connection
 
 
 class CCRVRepository:
-
     # =====================================================
     # SAVE CCRV REQUEST
     # =====================================================
@@ -20,7 +19,7 @@ class CCRVRepository:
         api_reference_id,
         raw_response,
         requested_at,
-        expected_completion_at
+        expected_completion_at,
     ):
 
         connection = get_connection()
@@ -51,11 +50,8 @@ class CCRVRepository:
         """
 
         cursor.execute(
-
             query,
-
             (
-
                 candidate_id,
                 bgv_id,
                 consent_id,
@@ -66,10 +62,8 @@ class CCRVRepository:
                 api_reference_id,
                 raw_response,
                 requested_at,
-                expected_completion_at
-
-            )
-
+                expected_completion_at,
+            ),
         )
 
         connection.commit()
@@ -86,22 +80,13 @@ class CCRVRepository:
     # GET LATEST REQUEST
     # =====================================================
     @staticmethod
-    def get_latest_request(
-
-            candidate_id
-
-    ):
+    def get_latest_request(candidate_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-
-            dictionary=True
-
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
-
             """
 
             SELECT *
@@ -115,13 +100,7 @@ class CCRVRepository:
             LIMIT 1
 
             """,
-
-            (
-
-                candidate_id,
-
-            )
-
+            (candidate_id,),
         )
 
         result = cursor.fetchone()
@@ -136,22 +115,13 @@ class CCRVRepository:
     # GET REQUEST USING TRANSACTION ID
     # =====================================================
     @staticmethod
-    def get_request_by_transaction_id(
-
-            transaction_id
-
-    ):
+    def get_request_by_transaction_id(transaction_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-
-            dictionary=True
-
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
-
             """
 
             SELECT *
@@ -163,13 +133,7 @@ class CCRVRepository:
             LIMIT 1
 
             """,
-
-            (
-
-                transaction_id,
-
-            )
-
+            (transaction_id,),
         )
 
         result = cursor.fetchone()
@@ -185,15 +149,7 @@ class CCRVRepository:
     # =====================================================
     @staticmethod
     def update_request_status(
-
-            transaction_id,
-
-            ccrv_status,
-
-            raw_response=None,
-
-            completed_at=None
-
+        transaction_id, ccrv_status, raw_response=None, completed_at=None
     ):
 
         connection = get_connection()
@@ -201,7 +157,6 @@ class CCRVRepository:
         cursor = connection.cursor()
 
         cursor.execute(
-
             """
 
             UPDATE ccrv_requests
@@ -217,19 +172,7 @@ class CCRVRepository:
             WHERE transaction_id=%s
 
             """,
-
-            (
-
-                ccrv_status,
-
-                raw_response,
-
-                completed_at,
-
-                transaction_id
-
-            )
-
+            (ccrv_status, raw_response, completed_at, transaction_id),
         )
 
         connection.commit()
@@ -242,20 +185,13 @@ class CCRVRepository:
     # MARK FETCH ATTEMPTED
     # =====================================================
     @staticmethod
-    def mark_fetch_attempted(
-
-            transaction_id,
-
-            fetch_attempted_at
-
-    ):
+    def mark_fetch_attempted(transaction_id, fetch_attempted_at):
 
         connection = get_connection()
 
         cursor = connection.cursor()
 
         cursor.execute(
-
             """
 
             UPDATE ccrv_requests
@@ -269,15 +205,7 @@ class CCRVRepository:
             WHERE transaction_id=%s
 
             """,
-
-            (
-
-                fetch_attempted_at,
-
-                transaction_id
-
-            )
-
+            (fetch_attempted_at, transaction_id),
         )
 
         connection.commit()
@@ -290,22 +218,13 @@ class CCRVRepository:
     # UPDATE REQUEST COMPLETED
     # =====================================================
     @staticmethod
-    def update_request_completed(
-
-            transaction_id,
-
-            raw_response,
-
-            completed_at
-
-    ):
+    def update_request_completed(transaction_id, raw_response, completed_at):
 
         connection = get_connection()
 
         cursor = connection.cursor()
 
         cursor.execute(
-
             """
 
             UPDATE ccrv_requests
@@ -321,17 +240,7 @@ class CCRVRepository:
             WHERE transaction_id=%s
 
             """,
-
-            (
-
-                raw_response,
-
-                completed_at,
-
-                transaction_id
-
-            )
-
+            (raw_response, completed_at, transaction_id),
         )
 
         connection.commit()
@@ -344,20 +253,13 @@ class CCRVRepository:
     # UPDATE REQUEST FAILED
     # =====================================================
     @staticmethod
-    def update_request_failed(
-
-            transaction_id,
-
-            raw_response
-
-    ):
+    def update_request_failed(transaction_id, raw_response):
 
         connection = get_connection()
 
         cursor = connection.cursor()
 
         cursor.execute(
-
             """
 
             UPDATE ccrv_requests
@@ -371,15 +273,7 @@ class CCRVRepository:
             WHERE transaction_id=%s
 
             """,
-
-            (
-
-                raw_response,
-
-                transaction_id
-
-            )
-
+            (raw_response, transaction_id),
         )
 
         connection.commit()
@@ -392,22 +286,13 @@ class CCRVRepository:
     # DELETE EXISTING RESULT
     # =====================================================
     @staticmethod
-    def delete_existing_result(
-
-            ccrv_request_id
-
-    ):
+    def delete_existing_result(ccrv_request_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-
-            dictionary=True
-
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
-
             """
 
             SELECT id
@@ -419,23 +304,15 @@ class CCRVRepository:
             LIMIT 1
 
             """,
-
-            (
-
-                ccrv_request_id,
-
-            )
-
+            (ccrv_request_id,),
         )
 
         result = cursor.fetchone()
 
         if result:
-
             ccrv_result_id = result["id"]
 
             cursor.execute(
-
                 """
 
                 DELETE FROM ccrv_case_results
@@ -443,17 +320,10 @@ class CCRVRepository:
                 WHERE ccrv_result_id=%s
 
                 """,
-
-                (
-
-                    ccrv_result_id,
-
-                )
-
+                (ccrv_result_id,),
             )
 
             cursor.execute(
-
                 """
 
                 DELETE FROM ccrv_results
@@ -461,13 +331,7 @@ class CCRVRepository:
                 WHERE id=%s
 
                 """,
-
-                (
-
-                    ccrv_result_id,
-
-                )
-
+                (ccrv_result_id,),
             )
 
         connection.commit()
@@ -477,11 +341,11 @@ class CCRVRepository:
         connection.close()
 
         # =====================================================
+
     # SAVE CCRV RESULT
     # =====================================================
     @staticmethod
     def save_ccrv_result(
-
         ccrv_request_id,
         candidate_id,
         bgv_id,
@@ -494,8 +358,7 @@ class CCRVRepository:
         provider_name,
         api_reference_id,
         raw_response,
-        verified_at=None
-
+        verified_at=None,
     ):
 
         ####################################################
@@ -503,7 +366,6 @@ class CCRVRepository:
         ####################################################
 
         if verified_at is None:
-
             verified_at = datetime.now()
 
         ####################################################
@@ -557,7 +419,6 @@ class CCRVRepository:
         """
 
         values = (
-
             ccrv_request_id,
             candidate_id,
             bgv_id,
@@ -570,17 +431,10 @@ class CCRVRepository:
             provider_name,
             api_reference_id,
             raw_response,
-            verified_at
-
+            verified_at,
         )
 
-        cursor.execute(
-
-            query,
-
-            values
-
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
@@ -596,22 +450,13 @@ class CCRVRepository:
     # RESULT EXISTS
     # =====================================================
     @staticmethod
-    def result_exists(
-
-            ccrv_request_id
-
-    ):
+    def result_exists(ccrv_request_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-
-            dictionary=True
-
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
-
             """
 
             SELECT id
@@ -623,13 +468,7 @@ class CCRVRepository:
             LIMIT 1
 
             """,
-
-            (
-
-                ccrv_request_id,
-
-            )
-
+            (ccrv_request_id,),
         )
 
         result = cursor.fetchone()
@@ -644,22 +483,13 @@ class CCRVRepository:
     # GET CCRV RESULT
     # =====================================================
     @staticmethod
-    def get_result(
-
-            ccrv_request_id
-
-    ):
+    def get_result(ccrv_request_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-
-            dictionary=True
-
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
-
             """
 
             SELECT *
@@ -673,13 +503,7 @@ class CCRVRepository:
             LIMIT 1
 
             """,
-
-            (
-
-                ccrv_request_id,
-
-            )
-
+            (ccrv_request_id,),
         )
 
         result = cursor.fetchone()
@@ -695,7 +519,6 @@ class CCRVRepository:
     # =====================================================
     @staticmethod
     def save_case(
-
         ccrv_result_id,
         case_id,
         filing_number,
@@ -717,8 +540,7 @@ class CCRVRepository:
         registration_date,
         hearing_date,
         decision_date,
-        raw_case_data
-
+        raw_case_data,
     ):
 
         connection = get_connection()
@@ -786,7 +608,6 @@ class CCRVRepository:
         """
 
         values = (
-
             ccrv_result_id,
             case_id,
             filing_number,
@@ -808,17 +629,10 @@ class CCRVRepository:
             registration_date,
             hearing_date,
             decision_date,
-            raw_case_data
-
+            raw_case_data,
         )
 
-        cursor.execute(
-
-            query,
-
-            values
-
-        )
+        cursor.execute(query, values)
 
         connection.commit()
 
@@ -830,22 +644,13 @@ class CCRVRepository:
     # GET CCRV CASES
     # =====================================================
     @staticmethod
-    def get_cases(
-
-            ccrv_result_id
-
-    ):
+    def get_cases(ccrv_result_id):
 
         connection = get_connection()
 
-        cursor = connection.cursor(
-
-            dictionary=True
-
-        )
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(
-
             """
 
             SELECT *
@@ -857,13 +662,7 @@ class CCRVRepository:
             ORDER BY id
 
             """,
-
-            (
-
-                ccrv_result_id,
-
-            )
-
+            (ccrv_result_id,),
         )
 
         results = cursor.fetchall()

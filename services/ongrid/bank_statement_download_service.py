@@ -6,7 +6,6 @@ from repositories.bank_statement_repository import BankStatementRepository
 
 
 class BankStatementDownloadService:
-
     ####################################################
     # DOWNLOAD REPORT
     ####################################################
@@ -17,7 +16,7 @@ class BankStatementDownloadService:
         transaction_id,
         request_id,
         callback_payload=None,
-        fetch_response=None
+        fetch_response=None,
     ):
         ####################################################
         # DOWNLOAD LOG
@@ -39,9 +38,7 @@ class BankStatementDownloadService:
         ####################################################
         # REQUEST DETAILS
         ####################################################
-        request = BankStatementRepository.get_request_by_transaction_id(
-            transaction_id
-        )
+        request = BankStatementRepository.get_request_by_transaction_id(transaction_id)
 
         ####################################################
         # REQUEST EXISTS
@@ -66,8 +63,7 @@ class BankStatementDownloadService:
         # RESULT EXISTS
         ####################################################
         existing_result = BankStatementRepository.get_result(
-            request["candidate_id"],
-            request["bgv_id"]
+            request["candidate_id"], request["bgv_id"]
         )
 
         ####################################################
@@ -82,7 +78,7 @@ class BankStatementDownloadService:
             return {
                 "success": True,
                 "message": "Bank Statement report already downloaded.",
-                "request_status": "COMPLETED"
+                "request_status": "COMPLETED",
             }
 
         ####################################################
@@ -133,9 +129,7 @@ class BankStatementDownloadService:
         # REPORT DIRECTORY & CREATION
         ####################################################
         report_directory = os.path.join(
-            "uploads",
-            f"candidate_{candidate_id}",
-            "bank_statement"
+            "uploads", f"candidate_{candidate_id}", "bank_statement"
         )
         os.makedirs(report_directory, exist_ok=True)
 
@@ -143,12 +137,10 @@ class BankStatementDownloadService:
         # FILE PATHS
         ####################################################
         json_file_path = os.path.join(
-            report_directory,
-            f"bank_statement_{transaction_id}.json"
+            report_directory, f"bank_statement_{transaction_id}.json"
         )
         excel_file_path = os.path.join(
-            report_directory,
-            f"bank_statement_{transaction_id}.xlsx"
+            report_directory, f"bank_statement_{transaction_id}.xlsx"
         )
 
         ####################################################
@@ -172,40 +164,16 @@ class BankStatementDownloadService:
             print("=" * 80)
 
             try:
-
-                json_response = requests.get(
-
-                    json_link,
-
-                    stream=True,
-
-                    timeout=60
-
-                )
+                json_response = requests.get(json_link, stream=True, timeout=60)
 
             except requests.exceptions.Timeout:
-
-                raise Exception(
-
-                    "JSON report download timed out."
-
-                )
+                raise Exception("JSON report download timed out.")
 
             except requests.exceptions.ConnectionError:
-
-                raise Exception(
-
-                    "Unable to connect to JSON report server."
-
-                )
+                raise Exception("Unable to connect to JSON report server.")
 
             except requests.exceptions.RequestException as error:
-
-                raise Exception(
-
-                    f"JSON report download failed : {error}"
-
-                )
+                raise Exception(f"JSON report download failed : {error}")
             if json_response.status_code != 200:
                 raise Exception(
                     f"Unable to download JSON report. HTTP Status : {json_response.status_code}"
@@ -214,7 +182,7 @@ class BankStatementDownloadService:
             content_type = json_response.headers.get("Content-Type", "")
             if "application/json" not in content_type.lower():
                 raise Exception(
-                f"""
+                    f"""
             Expected a JSON report from Gridlines.
 
             URL          : {json_link}
@@ -224,7 +192,7 @@ class BankStatementDownloadService:
             The provider returned a non-JSON response.
             This usually means the report URL is invalid, expired, or not yet available.
             """.strip()
-)
+                )
 
             try:
                 json_report = json_response.json()
@@ -262,7 +230,9 @@ class BankStatementDownloadService:
 
             content_type = excel_response.headers.get("Content-Type", "")
             if "text/html" in content_type.lower():
-                raise Exception("Excel download returned HTML instead of an Excel file.")
+                raise Exception(
+                    "Excel download returned HTML instead of an Excel file."
+                )
 
             # SAVE EXCEL FILE
             with open(excel_file_path, "wb") as file:
@@ -294,7 +264,7 @@ class BankStatementDownloadService:
             provider_excel_url=excel_link,
             json_file_path=json_file_path if json_link else None,
             excel_file_path=excel_file_path if excel_link else None,
-            report_generated_at=report_generated_at
+            report_generated_at=report_generated_at,
         )
 
         if not result_id:
@@ -307,7 +277,7 @@ class BankStatementDownloadService:
             transaction_id=transaction_id,
             request_status="COMPLETED",
             provider_status_code=request.get("provider_status_code"),
-            response_payload=json.dumps(response, default=str)
+            response_payload=json.dumps(response, default=str),
         )
 
         ####################################################
@@ -332,5 +302,5 @@ class BankStatementDownloadService:
             "result_id": result_id,
             "transaction_id": transaction_id,
             "json_file_path": json_file_path,
-            "excel_file_path": excel_file_path
+            "excel_file_path": excel_file_path,
         }

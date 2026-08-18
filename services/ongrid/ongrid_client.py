@@ -3,28 +3,27 @@ from config import Config
 
 
 class OnGridClient:
-
     @staticmethod
     def post(endpoint, payload):
         headers = {
             "X-API-Key": Config.GRIDLINES_API_KEY,
             "X-Auth-Type": "API-Key",
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Accept": "application/json",
         }
         try:
             response = requests.post(
                 f"{Config.GRIDLINES_PRODUCTION_URL}{endpoint}",
                 headers=headers,
                 json=payload,
-                timeout=60
+                timeout=60,
             )
         except Exception as e:
             return {
                 "success": False,
                 "status": 500,
                 "request_id": None,
-                "raw_response": str(e)
+                "raw_response": str(e),
             }
 
         if not response.ok:
@@ -38,7 +37,7 @@ class OnGridClient:
                 "success": False,
                 "status": response.status_code,
                 "request_id": None,
-                "raw_response": response.text
+                "raw_response": response.text,
             }
 
         try:
@@ -48,7 +47,7 @@ class OnGridClient:
                 "success": False,
                 "status": response.status_code,
                 "request_id": None,
-                "raw_response": response.text
+                "raw_response": response.text,
             }
 
     @staticmethod
@@ -57,7 +56,7 @@ class OnGridClient:
             "X-API-Key": Config.GRIDLINES_API_KEY,
             "X-Auth-Type": "API-Key",
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Accept": "application/json",
         }
 
         if headers:
@@ -67,14 +66,14 @@ class OnGridClient:
             response = requests.get(
                 f"{Config.GRIDLINES_PRODUCTION_URL}{endpoint}",
                 headers=request_headers,
-                timeout=60
+                timeout=60,
             )
         except Exception as e:
             return {
                 "success": False,
                 "status": 500,
                 "request_id": None,
-                "raw_response": str(e)
+                "raw_response": str(e),
             }
 
         if not response.ok:
@@ -88,7 +87,7 @@ class OnGridClient:
                 "success": False,
                 "status": response.status_code,
                 "request_id": None,
-                "raw_response": response.text
+                "raw_response": response.text,
             }
 
         try:
@@ -98,7 +97,7 @@ class OnGridClient:
                 "success": False,
                 "status": response.status_code,
                 "request_id": None,
-                "raw_response": response.text
+                "raw_response": response.text,
             }
 
     @staticmethod
@@ -106,7 +105,7 @@ class OnGridClient:
         headers = {
             "X-API-Key": Config.GRIDLINES_API_KEY,
             "X-Auth-Type": "API-Key",
-            "Accept": "application/json"
+            "Accept": "application/json",
         }
 
         try:
@@ -115,28 +114,34 @@ class OnGridClient:
                 headers=headers,
                 files=files,
                 data=data,
-                timeout=60
+                timeout=60,
             )
 
             print("=" * 80)
-            print("DEEPFAKE INIT RESPONSE")
+            print("GRIDLINES MULTIPART RESPONSE")
+            print("ENDPOINT =", endpoint)
             print("STATUS =", response.status_code)
             print("BODY =", response.text)
             print("=" * 80)
 
         except Exception as e:
+            print("=" * 80)
+            print("GRIDLINES MULTIPART CONNECTION ERROR")
             print(e)
+            print("=" * 80)
+
             return {
                 "success": False,
                 "status": 500,
-                "message": str(e)
+                "message": str(e),
             }
 
         if not response.ok:
             return {
                 "success": False,
                 "status": response.status_code,
-                "message": response.text
+                "message": response.text,
+                "raw_response": response.text,
             }
 
         try:
@@ -146,14 +151,14 @@ class OnGridClient:
                 return {
                     "success": False,
                     "status": response.status_code,
-                    "message": "Empty response body"
+                    "message": "Empty response body",
                 }
 
             return response.json()
 
         except Exception as e:
             print("=" * 80)
-            print("JSON PARSE ERROR")
+            print("GRIDLINES JSON PARSE ERROR")
             print(e)
             print("RAW BODY")
             print(response.text)
@@ -162,5 +167,5 @@ class OnGridClient:
             return {
                 "success": False,
                 "status": response.status_code,
-                "message": response.text
+                "message": response.text,
             }
