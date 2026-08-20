@@ -19,4 +19,4 @@ uploads/
 
 # VS Code
 .vscode/
-generated_reports/
+generated_reports/.DS_Store
