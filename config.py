@@ -103,15 +103,19 @@ class Config:
 
     if not GRIDLINES_PRODUCTION_URL:
         print("WARNING: GRIDLINES_PRODUCTION_URL is not loaded")
+
     # ==========================================
     # CALLBACK URL
     # ==========================================
 
-    CCRV_CALLBACK_URL = "http://localhost:5001/api/v1/ccrv/callback"
+    CCRV_CALLBACK_URL = os.getenv("CCRV_CALLBACK_URL", "").strip().rstrip("/")
 
     BANK_STATEMENT_CALLBACK_URL = (
         os.getenv("BANK_STATEMENT_CALLBACK_URL", "").strip().rstrip("/")
     )
+
+    if not CCRV_CALLBACK_URL:
+        print("WARNING: CCRV_CALLBACK_URL is not loaded")
 
     if not BANK_STATEMENT_CALLBACK_URL:
         print("WARNING: BANK_STATEMENT_CALLBACK_URL is not loaded")
