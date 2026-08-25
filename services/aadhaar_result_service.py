@@ -37,7 +37,11 @@ class AadhaarResultService:
             data = aadhaar_data.get("data")
 
             if isinstance(data, dict):
-                source = data
+                inner_data = data.get("data")
+                if isinstance(inner_data, dict):
+                    source = inner_data
+                else:
+                    source = data
             else:
                 source = aadhaar_data
 
